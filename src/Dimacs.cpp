@@ -20,7 +20,9 @@ namespace dimacs {
         int result = 0;
         while (*s) {
             if (*s < '0' || *s > '9') {
-                throw std::invalid_argument("Invalid input: " + *s);
+                std::string what_msg = "Invalid input: ";
+                what_msg += *s;
+                throw std::invalid_argument(what_msg);
             }
             result += *s - '0';
             if (*(s+1)) {
