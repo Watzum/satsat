@@ -8,6 +8,8 @@
 #include <iostream>
 #include <string>
 
+#include "include/Dimacs.h"
+
 DimacsReader::DimacsReader(const std::string& filePath, VariableClauseRelation& vcr) : relation{vcr}, fileReader{filePath} {
 };
 
@@ -33,6 +35,7 @@ void DimacsReader::readHeader() {
         throw std::invalid_argument("Expected keyword 'cnf'");
     }
     fileReader >> strInput;
+    long variableCount = dimacs::to_positive_long(strInput);
 }
 
 
