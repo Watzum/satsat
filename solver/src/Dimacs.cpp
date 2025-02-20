@@ -7,13 +7,16 @@
 #include <string>
 #include <iostream>
 
-#include "Dimacs.h"
+#include "include/Dimacs.h"
 
 
 namespace dimacs {
 
     //only works with non-negative integers
     long to_positive_long(char const *s) {
+        if (*s == '\0') {
+            throw std::invalid_argument("String cannot be empty!");
+        }
         if (s == nullptr) {
             throw std::invalid_argument("Expected number of variables!");
         }
