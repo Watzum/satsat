@@ -8,7 +8,7 @@
 #include <string>
 
 namespace dimacs {
-    long to_positive_long(char const *s);
+    long to_positive_long(const std::string&);
 }
 
 

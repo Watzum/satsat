@@ -13,26 +13,25 @@
 namespace dimacs {
 
     //only works with non-negative integers
-    long to_positive_long(char const *s) {
-        if (*s == '\0') {
-            throw std::invalid_argument("String cannot be empty!");
+    long to_positive_long(const std::string& s) {
+        if (s.empty()) {
+            throw std::invalid_argument("Expected number!");
         }
-        if (s == nullptr) {
-            throw std::invalid_argument("Expected number of variables!");
-        }
+
         int result = 0;
-        while (*s) {
-            if (*s < '0' || *s > '9') {
+        int i = 0;
+        while (i < s.size()) {
+            if (s.at(i) < '0' || s.at(i) > '9') {
                 std::string what_msg = "Invalid input: ";
-                what_msg += *s;
+                what_msg += s;
                 throw std::invalid_argument(what_msg);
             }
-            result += *s - '0';
-            if (*(s+1)) {
+            result += s.at(i) - '0';
+            if (s.size() < i + 1) {
                 result *= 10;
             }
-            s++;
+            i++;
         }
-        return result;
+        return stol(s);
     }
 }
