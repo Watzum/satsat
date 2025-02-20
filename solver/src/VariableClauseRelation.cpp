@@ -2,7 +2,7 @@
 // Created by Emil Watz on 01.02.2025.
 //
 
-#include "VariableClauseRelation.h"
+#include "include/VariableClauseRelation.h"
 
 #include <iostream>
 

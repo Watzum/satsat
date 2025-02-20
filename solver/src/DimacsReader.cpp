@@ -2,12 +2,10 @@
 // Created by Emil Watz on 08.02.2025.
 //
 
-#include "DimacsReader.h"
+#include "include/DimacsReader.h"
+#include "include/VariableClauseRelation.h"
 
 #include <iostream>
-
-#include "VariableClauseRelation.h"
-
 #include <string>
 
 DimacsReader::DimacsReader(const std::string& filePath, VariableClauseRelation& vcr) : relation{vcr}, fileReader{filePath} {

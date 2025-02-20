@@ -7,9 +7,9 @@
 #include <string>
 
 
-#include "DimacsReader.h"
-#include "VariableClauseRelation.h"
-#include "Dimacs.h"
+#include "include/DimacsReader.h"
+#include "include/VariableClauseRelation.h"
+#include "include/Dimacs.h"
 
 
 using namespace std;
@@ -18,7 +18,6 @@ int main() {
     std::cout << "Hello World" << std::endl;
     VariableClauseRelation f;
 
-    std::cout << dimacs::to_positive_long("12a3") << '\n';
     try {
         DimacsReader r{"../dimacsTest.dimacs", f};
         r.readFile();
