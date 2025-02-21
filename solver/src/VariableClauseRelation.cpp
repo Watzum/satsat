@@ -8,7 +8,7 @@
 
 
 VariableClauseRelation::VariableClauseRelation() {
-    std::cout << "New VariableClauseRelation" << '\n';
+    //std::cout << "New VariableClauseRelation" << '\n';
 }
 
 long VariableClauseRelation::addClause() {

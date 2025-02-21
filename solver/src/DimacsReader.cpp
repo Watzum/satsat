@@ -10,6 +10,7 @@
 #include <string>
 
 #include "include/Dimacs.h"
+#include "include/DimacsFormatException.h"
 
 DimacsReader::DimacsReader(const std::string& filePath, VariableClauseRelation& vcr) : relation{vcr}, fileReader{filePath} {
 };
@@ -17,7 +18,7 @@ DimacsReader::DimacsReader(const std::string& filePath, VariableClauseRelation& 
 
 void DimacsReader::readFile() {
     if (!fileReader) {
-        throw std::invalid_argument("Could not open dimacs file!");
+        throw std::runtime_error("Could not open dimacs file!");
     }
     readHeader();
     readClauses();
@@ -27,21 +28,19 @@ void DimacsReader::readFile() {
 void DimacsReader::readHeader() {
     std::string strInput{};
     fileReader >> strInput;
-    std::cout << "read: " + strInput << '\n';
     if (strInput != "p") {
-        throw std::invalid_argument("File does not start with 'p'");
+        throw DimacsFormatException("File does not start with 'p'");
     }
     fileReader >> strInput;
-    std::cout << "read: " + strInput << '\n';
     if (strInput != "cnf") {
-        throw std::invalid_argument("Expected keyword 'cnf'");
+        throw DimacsFormatException("Expected keyword 'cnf'");
     }
     fileReader >> strInput;
     long variableCount = dimacs::to_positive_long(strInput);
-    std::cout << "Number of variables: " << variableCount << std::endl;
+    //std::cout << "Number of variables: " << variableCount << std::endl;
     fileReader >> strInput;
     long clauseCount = dimacs::to_positive_long(strInput);
-    std::cout << "Number of clauses: " << clauseCount << std::endl;
+    //std::cout << "Number of clauses: " << clauseCount << std::endl;
 }
 
 void DimacsReader::readClauses() {
@@ -55,7 +54,7 @@ void DimacsReader::readClauses() {
         }
         if (strInput == "0") {
             if (currentClause == -1) {
-                throw std::invalid_argument("Empty clause detected");
+                throw DimacsFormatException("Empty clause detected");
             }
             currentClause = -1;
         } else {
@@ -75,5 +74,8 @@ void DimacsReader::readClauses() {
                 variable_id_map.emplace(var_file_number, new_var_id);
             }
         }
+    }
+    if (currentClause != -1) {
+        throw DimacsFormatException("Expected 0 at the end of file");
     }
 }
