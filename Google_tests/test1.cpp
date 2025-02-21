@@ -34,12 +34,14 @@ TEST(Test1Suite, DimacsReader_Positive1) {
     ASSERT_EQ(rel.getClausesOfVariable(4).size(), 1);
 }
 
-TEST(Test1Suite, DimacsReader_Throw1) {
+TEST(Test1Suite, DimacsReader_DimacsFormatException_Test) {
     VariableClauseRelation rel;
     DimacsReader reader{rel};
 
-    ASSERT_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsThrow1.dimacs"), DimacsFormatException);
-    ASSERT_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsThrow2.dimacs"), DimacsFormatException);
-    ASSERT_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsThrow3.dimacs"), DimacsFormatException);
-    ASSERT_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsThrow4.dimacs"), DimacsFormatException);
+    for (int i = 1; i <= 8; i++) {
+        std::string s = "../../Google_tests/dimacsFiles/DimacsThrow";
+        s += std::to_string(i);
+        s += ".dimacs";
+        ASSERT_THROW(reader.readFile(s), DimacsFormatException);
+    }
 }

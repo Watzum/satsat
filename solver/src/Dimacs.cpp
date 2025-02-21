@@ -8,13 +8,15 @@
 
 #include "include/Dimacs.h"
 
+#include "include/DimacsFormatException.h"
+
 
 namespace dimacs {
 
     //only works with non-negative integers
     long to_positive_long(const std::string& s) {
         if (s.empty()) {
-            throw std::invalid_argument("Expected number!");
+            throw DimacsFormatException("Expected number!");
         }
         int result = 0;
         int i = 0;
@@ -22,7 +24,7 @@ namespace dimacs {
             if (s.at(i) < '0' || s.at(i) > '9') {
                 std::string what_msg = "Invalid input: ";
                 what_msg += s;
-                throw std::invalid_argument(what_msg);
+                throw DimacsFormatException(what_msg);
             }
             result += s.at(i) - '0';
             if (s.size() < i + 1) {
