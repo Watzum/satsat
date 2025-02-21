@@ -17,10 +17,10 @@ int main() {
     std::cout << "Hello World" << std::endl;
 
     VariableClauseRelation rel;
-    DimacsReader reader3{"../Google_tests/dimacsFiles/DimacsThrow2.dimacs", rel};
+    DimacsReader reader3{rel};
     try {
-        reader3.readFile();
+        reader3.readFile("../dimacsTest.dimacs");
     } catch (DimacsFormatException& ex) {
-        std::cout << ex.what() << std::endl;
+        std::cout << "Exception: " << ex.what() << std::endl;
     }
 }

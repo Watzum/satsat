@@ -11,11 +11,11 @@
 
 class DimacsReader {
     public:
-        DimacsReader(const std::string&, VariableClauseRelation&);
-        void readFile();
+        explicit DimacsReader(VariableClauseRelation&);
+        void readFile(const std::string &filePath);
     private:
         VariableClauseRelation& relation;
-        std::ifstream fileReader;
+        std::ifstream fileReader = nullptr;
 
         void readHeader();
         void readClauses();

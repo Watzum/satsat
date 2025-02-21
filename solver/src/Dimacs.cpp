@@ -5,7 +5,6 @@
 
 #include <fstream>
 #include <string>
-#include <iostream>
 
 #include "include/Dimacs.h"
 
@@ -32,5 +31,11 @@ namespace dimacs {
             i++;
         }
         return stol(s);
+    }
+
+    void ignore_whitespaces(std::ifstream& fileReader) {
+        if (fileReader.peek() == ' ') {
+            fileReader.ignore(1);
+        }
     }
 }

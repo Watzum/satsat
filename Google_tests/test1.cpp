@@ -24,9 +24,9 @@ TEST(Test1Suite, to_positive_long) {
 
 TEST(Test1Suite, DimacsReader_Positive1) {
     VariableClauseRelation rel;
-    DimacsReader reader{"../../Google_tests/dimacsFiles/DimacsTest1.dimacs", rel};
+    DimacsReader reader{rel};
 
-    ASSERT_NO_THROW(reader.readFile());
+    ASSERT_NO_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsTest1.dimacs"));
     ASSERT_EQ(rel.getClausesOfVariable(0).size(), 1);
     ASSERT_EQ(rel.getClausesOfVariable(1).size(), 2);
     ASSERT_EQ(rel.getClausesOfVariable(2).size(), 2);
@@ -36,11 +36,10 @@ TEST(Test1Suite, DimacsReader_Positive1) {
 
 TEST(Test1Suite, DimacsReader_Throw1) {
     VariableClauseRelation rel;
-    DimacsReader reader1{"../../Google_tests/dimacsFiles/DimacsThrow1.dimacs", rel};
-    DimacsReader reader2{"../../Google_tests/dimacsFiles/DimacsThrow2.dimacs", rel};
-    DimacsReader reader3{"../../Google_tests/dimacsFiles/DimacsThrow3.dimacs", rel};
+    DimacsReader reader{rel};
 
-    ASSERT_THROW(reader1.readFile(), DimacsFormatException);
-    ASSERT_THROW(reader2.readFile(), DimacsFormatException);
-    ASSERT_THROW(reader3.readFile(), DimacsFormatException);
+    ASSERT_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsThrow1.dimacs"), DimacsFormatException);
+    ASSERT_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsThrow2.dimacs"), DimacsFormatException);
+    ASSERT_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsThrow3.dimacs"), DimacsFormatException);
+    ASSERT_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsThrow4.dimacs"), DimacsFormatException);
 }

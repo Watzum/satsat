@@ -12,35 +12,48 @@
 #include "include/Dimacs.h"
 #include "include/DimacsFormatException.h"
 
-DimacsReader::DimacsReader(const std::string& filePath, VariableClauseRelation& vcr) : relation{vcr}, fileReader{filePath} {
+DimacsReader::DimacsReader(VariableClauseRelation& vcr) : relation{vcr} {
 };
 
 
-void DimacsReader::readFile() {
+void DimacsReader::readFile(const std::string& filePath) {
+    fileReader = std::ifstream{filePath};
     if (!fileReader) {
         throw std::runtime_error("Could not open dimacs file!");
     }
     readHeader();
     readClauses();
+    fileReader.close();
 }
 
 
 void DimacsReader::readHeader() {
     std::string strInput{};
-    fileReader >> strInput;
-    if (strInput != "p") {
+    char p;
+    fileReader.read(&p, 1);
+    if (p != 'p') {
         throw DimacsFormatException("File does not start with 'p'");
     }
-    fileReader >> strInput;
-    if (strInput != "cnf") {
+
+    char* buf = new char[3];
+    dimacs::ignore_whitespaces(fileReader);
+    fileReader.read(buf, 3);
+    if (buf[0] != 'c' || buf[1] != 'n' || buf[2] != 'f') {
         throw DimacsFormatException("Expected keyword 'cnf'");
     }
+    delete buf;
     fileReader >> strInput;
     long variableCount = dimacs::to_positive_long(strInput);
     //std::cout << "Number of variables: " << variableCount << std::endl;
     fileReader >> strInput;
     long clauseCount = dimacs::to_positive_long(strInput);
     //std::cout << "Number of clauses: " << clauseCount << std::endl;
+    dimacs::ignore_whitespaces(fileReader);
+    char linebreak;
+    fileReader.get(linebreak);
+    if (linebreak != '\n') {
+        throw DimacsFormatException("Wrong dimacs-header format!");
+    }
 }
 
 void DimacsReader::readClauses() {

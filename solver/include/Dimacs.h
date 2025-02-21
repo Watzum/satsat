@@ -9,6 +9,7 @@
 
 namespace dimacs {
     long to_positive_long(const std::string&);
+    void ignore_whitespaces(std::ifstream&);
 }
 
 
