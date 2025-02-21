@@ -18,6 +18,7 @@ class DimacsReader {
         std::ifstream fileReader;
 
         void readHeader();
+        void readClauses();
 
 };
 

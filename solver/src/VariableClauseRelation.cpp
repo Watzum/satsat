@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+
 VariableClauseRelation::VariableClauseRelation() {
     std::cout << "New VariableClauseRelation" << '\n';
 }
@@ -16,7 +17,7 @@ long VariableClauseRelation::addClause() {
     return clausesToVariableMap.size() - 1;
 }
 
-long VariableClauseRelation::addNewVariableToClause(long clauseId, bool polarity) {
+long VariableClauseRelation::addVariableToClause(long clauseId, bool polarity) {
     std::vector<std::pair<long, bool>> v;
     if (clausesToVariableMap.size() > clauseId) {
         long newVarId = variableToClauseMap.size();
@@ -29,7 +30,18 @@ long VariableClauseRelation::addNewVariableToClause(long clauseId, bool polarity
     }
 }
 
-std::vector<std::pair<long, bool>> VariableClauseRelation::getClausesOfVariable(long varId) {
+void VariableClauseRelation::addVariableToClause(long clauseId, long varId, bool polarity) {
+    if (variableToClauseMap.size() <= varId) {
+        throw std::out_of_range("Variable Id out of range!");
+    }
+    if (clausesToVariableMap.size() <= clauseId) {
+        throw std::out_of_range("Clause Id out of range!");
+    }
+    variableToClauseMap.at(varId).emplace_back(clauseId, polarity);
+    clausesToVariableMap.at(clauseId).emplace_back(varId, polarity);
+}
+
+std::vector<std::pair<long, bool>>& VariableClauseRelation::getClausesOfVariable(long varId) {
     if (variableToClauseMap.size() > varId) {
         return variableToClauseMap.at(varId);
     } else {
@@ -37,7 +49,7 @@ std::vector<std::pair<long, bool>> VariableClauseRelation::getClausesOfVariable(
     }
 }
 
-std::vector<std::pair<long, bool>> VariableClauseRelation::getVariablesOfClause(long clauseId) {
+std::vector<std::pair<long, bool>>& VariableClauseRelation::getVariablesOfClause(long clauseId) {
     if (clausesToVariableMap.size() > clauseId) {
         return clausesToVariableMap.at(clauseId);
     } else {

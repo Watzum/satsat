@@ -6,10 +6,8 @@
 #include <iostream>
 #include <string>
 
-
-#include "include/DimacsReader.h"
-#include "include/VariableClauseRelation.h"
-#include "include/Dimacs.h"
+#include "solver/include/DimacsReader.h"
+#include "solver/include/VariableClauseRelation.h"
 
 
 using namespace std;
@@ -26,12 +24,4 @@ int main() {
         return 1;
     }
     return 0;
-    /*long c1 = f.addClause();
-    long c2 = f.addClause();
-    long v1 = f.addNewVariableToClause(c1, true);
-    long v2 = f.addNewVariableToClause(c1, false);
-
-    for (auto& c : f.getVariablesOfClause(c1)) {
-        cout << c.first << "; " << c.second << endl;
-    }*/
 }

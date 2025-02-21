@@ -17,7 +17,6 @@ namespace dimacs {
         if (s.empty()) {
             throw std::invalid_argument("Expected number!");
         }
-
         int result = 0;
         int i = 0;
         while (i < s.size()) {
