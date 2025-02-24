@@ -13,8 +13,7 @@
 #include "include/Dimacs.h"
 #include "include/DimacsFormatException.h"
 
-DimacsReader::DimacsReader(VariableClauseRelation& vcr) : relation{vcr} {
-};
+DimacsReader::DimacsReader(): relation() {}
 
 
 CNFFormula DimacsReader::readFile(const std::string& filePath) {

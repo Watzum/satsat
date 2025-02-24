@@ -9,9 +9,15 @@
 #include "include/Dimacs.h"
 
 #include "include/DimacsFormatException.h"
+#include "include/DimacsReader.h"
+#include "include/VariableClauseRelation.h"
 
 
 namespace dimacs {
+    void solve(const std::string &) {
+        DimacsReader reader;
+
+    }
 
     //only works with non-negative integers
     long to_positive_long(const std::string& s) {

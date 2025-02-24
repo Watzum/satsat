@@ -11,10 +11,10 @@
 
 class DimacsReader {
     public:
-        explicit DimacsReader(VariableClauseRelation&);
+        DimacsReader();
         CNFFormula readFile(const std::string &filePath);
     private:
-        VariableClauseRelation& relation;
+        VariableClauseRelation relation;
         std::ifstream fileReader = nullptr;
 
         void readHeader();

@@ -20,6 +20,10 @@ public:
 
     long getFileVarOf(long internalVar);
     long getInternalVarOf(long fileVar);
+    //pre: varId >= 0
+    std::vector<std::pair<long, bool>>& getClausesOfVariable(long varId);
+    //pre: clauseId >= 0
+    std::vector<std::pair<long, bool>>& getVariablesOfClause(long clauseId);
 private:
     std::vector<std::vector<std::pair<long, bool>>> clausesToVariableMap;
     std::vector<std::vector<std::pair<long, bool>>> variableToClauseMap;

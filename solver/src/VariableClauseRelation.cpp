@@ -53,22 +53,6 @@ void VariableClauseRelation::addVariableToClause(long clauseId, long varId, bool
     }
 }
 
-std::vector<std::pair<long, bool>>& VariableClauseRelation::getClausesOfVariable(long varId) {
-    if (variableToClauseMap.size() > varId) {
-        return variableToClauseMap.at(varId);
-    } else {
-        throw std::runtime_error("Variable does not exist");
-    }
-}
-
-std::vector<std::pair<long, bool>>& VariableClauseRelation::getVariablesOfClause(long clauseId) {
-    if (clausesToVariableMap.size() > clauseId) {
-        return clausesToVariableMap.at(clauseId);
-    } else {
-        throw std::runtime_error("Clause does not exist");
-    }
-}
-
 CNFFormula VariableClauseRelation::setupFormula(std::map<long, long> fileToInternalVar, std::map<long, long> internalToFileVar) {
     std::make_heap(variables.begin(), variables.end(), variable_comparison);
     CNFFormula c(clausesToVariableMap, variableToClauseMap, variables, std::move(fileToInternalVar), std::move(internalToFileVar));

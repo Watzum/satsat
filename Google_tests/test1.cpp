@@ -23,10 +23,10 @@ TEST(Test1Suite, to_positive_long) {
 }
 
 TEST(Test1Suite, DimacsReader_Positive1) {
-    VariableClauseRelation rel;
-    DimacsReader reader{rel};
+    DimacsReader reader;
 
-    ASSERT_NO_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsTest1.dimacs"));
+    //ASSERT_NO_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsTest1.dimacs"));
+    CNFFormula rel = reader.readFile("../../Google_tests/dimacsFiles/DimacsTest1.dimacs");
     ASSERT_EQ(rel.getClausesOfVariable(0).size(), 1);
     ASSERT_EQ(rel.getClausesOfVariable(1).size(), 2);
     ASSERT_EQ(rel.getClausesOfVariable(2).size(), 2);
@@ -35,8 +35,7 @@ TEST(Test1Suite, DimacsReader_Positive1) {
 }
 
 TEST(Test1Suite, DimacsReader_DimacsFormatException_Test) {
-    VariableClauseRelation rel;
-    DimacsReader reader{rel};
+    DimacsReader reader;
 
     for (int i = 1; i <= 8; i++) {
         std::string s = "../../Google_tests/dimacsFiles/DimacsThrow";
@@ -47,8 +46,7 @@ TEST(Test1Suite, DimacsReader_DimacsFormatException_Test) {
 }
 
 TEST(Test1Suite, CNFFormula_FileToInternalVarMap) {
-    VariableClauseRelation rel;
-    DimacsReader reader{rel};
+    DimacsReader reader;
     CNFFormula c{reader.readFile("../../Google_tests/dimacsFiles/DimacsInternalRep1.dimacs")};
     ASSERT_EQ(c.getFileVarOf(c.getInternalVarOf(15)), 15);
     ASSERT_EQ(c.getFileVarOf(c.getInternalVarOf(7)), 7);

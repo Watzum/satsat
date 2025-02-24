@@ -17,10 +17,6 @@ class VariableClauseRelation {
         long addClause();
         long addVariableToClause(long clauseId, bool polarity);
         void addVariableToClause(long clauseId, long varId, bool polarity);
-        //pre: varId >= 0
-        std::vector<std::pair<long, bool>>& getClausesOfVariable(long varId);
-        //pre: clauseId >= 0
-        std::vector<std::pair<long, bool>>& getVariablesOfClause(long clauseId);
 
         CNFFormula setupFormula(std::map<long, long>, std::map<long, long>);
     private:
