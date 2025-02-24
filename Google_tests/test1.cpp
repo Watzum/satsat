@@ -13,13 +13,13 @@ TEST(Test1Suite, to_positive_long) {
     ASSERT_EQ(dimacs::to_positive_long("123"), 123);
     ASSERT_EQ(dimacs::to_positive_long("123456789"), 123456789);
 
-    ASSERT_THROW(dimacs::to_positive_long(""), std::invalid_argument);
+    ASSERT_THROW(dimacs::to_positive_long(""), DimacsFormatException);
 
-    ASSERT_THROW(dimacs::to_positive_long("a123"), std::invalid_argument);
-    ASSERT_THROW(dimacs::to_positive_long("123y"), std::invalid_argument);
-    ASSERT_THROW(dimacs::to_positive_long("1b23"), std::invalid_argument);
-    ASSERT_THROW(dimacs::to_positive_long("-123"), std::invalid_argument);
-    ASSERT_THROW(dimacs::to_positive_long("5456.4"), std::invalid_argument);
+    ASSERT_THROW(dimacs::to_positive_long("a123"), DimacsFormatException);
+    ASSERT_THROW(dimacs::to_positive_long("123y"), DimacsFormatException);
+    ASSERT_THROW(dimacs::to_positive_long("1b23"), DimacsFormatException);
+    ASSERT_THROW(dimacs::to_positive_long("-123"), DimacsFormatException);
+    ASSERT_THROW(dimacs::to_positive_long("5456.4"), DimacsFormatException);
 }
 
 TEST(Test1Suite, DimacsReader_Positive1) {
@@ -44,4 +44,15 @@ TEST(Test1Suite, DimacsReader_DimacsFormatException_Test) {
         s += ".dimacs";
         ASSERT_THROW(reader.readFile(s), DimacsFormatException);
     }
+}
+
+TEST(Test1Suite, CNFFormula_FileToInternalVarMap) {
+    VariableClauseRelation rel;
+    DimacsReader reader{rel};
+    CNFFormula c{reader.readFile("../../Google_tests/dimacsFiles/DimacsInternalRep1.dimacs")};
+    ASSERT_EQ(c.getFileVarOf(c.getInternalVarOf(15)), 15);
+    ASSERT_EQ(c.getFileVarOf(c.getInternalVarOf(7)), 7);
+    ASSERT_EQ(c.getFileVarOf(c.getInternalVarOf(8)), 8);
+    ASSERT_EQ(c.getFileVarOf(c.getInternalVarOf(32)), 32);
+    ASSERT_EQ(c.getFileVarOf(c.getInternalVarOf(1)), 1);
 }

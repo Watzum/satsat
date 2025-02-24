@@ -9,6 +9,7 @@
 #include <map>
 #include <string>
 
+#include "include/CNFFormula.h"
 #include "include/Dimacs.h"
 #include "include/DimacsFormatException.h"
 
@@ -16,14 +17,15 @@ DimacsReader::DimacsReader(VariableClauseRelation& vcr) : relation{vcr} {
 };
 
 
-void DimacsReader::readFile(const std::string& filePath) {
+CNFFormula DimacsReader::readFile(const std::string& filePath) {
     fileReader = std::ifstream{filePath};
     if (!fileReader) {
         throw std::runtime_error("Could not open dimacs file!");
     }
     readHeader();
-    readClauses();
+    CNFFormula c = readClauses();
     fileReader.close();
+    return c;
 }
 
 
@@ -56,8 +58,9 @@ void DimacsReader::readHeader() {
     }
 }
 
-void DimacsReader::readClauses() {
-    std::map<long, long> variable_id_map;
+CNFFormula DimacsReader::readClauses() {
+    std::map<long, long> fileToInternal;
+    std::map<long, long> internalToFile;
     std::string strInput{};
     std::string clause{};
     long currentClause = -1;
@@ -80,15 +83,17 @@ void DimacsReader::readClauses() {
                 var_file_number = dimacs::to_positive_long(strInput);
                 polarity = true;
             }
-            if (auto search = variable_id_map.find(var_file_number); search != variable_id_map.end()) {
+            if (auto search = fileToInternal.find(var_file_number); search != fileToInternal.end()) {
                 relation.addVariableToClause(currentClause, search->second, polarity);
             } else {
                 long new_var_id = relation.addVariableToClause(currentClause, polarity);
-                variable_id_map.emplace(var_file_number, new_var_id);
+                fileToInternal.emplace(var_file_number, new_var_id);
+                internalToFile.emplace(new_var_id, var_file_number);
             }
         }
     }
     if (currentClause != -1) {
         throw DimacsFormatException("Expected 0 at the end of file");
     }
+    return relation.setupFormula(std::move(fileToInternal), std::move(internalToFile));
 }

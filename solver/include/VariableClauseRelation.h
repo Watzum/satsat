@@ -8,6 +8,9 @@
 #include <vector>
 #include <utility>
 
+#include "CNFFormula.h"
+#include "Variable.h"
+
 class VariableClauseRelation {
     public:
         VariableClauseRelation();
@@ -18,10 +21,12 @@ class VariableClauseRelation {
         std::vector<std::pair<long, bool>>& getClausesOfVariable(long varId);
         //pre: clauseId >= 0
         std::vector<std::pair<long, bool>>& getVariablesOfClause(long clauseId);
+
+        CNFFormula setupFormula(std::map<long, long>, std::map<long, long>);
     private:
         std::vector<std::vector<std::pair<long, bool>>> clausesToVariableMap;
         std::vector<std::vector<std::pair<long, bool>>> variableToClauseMap;
-        //std::vector<Variable> variables;
+        std::vector<Variable> variables;
 };
 
 

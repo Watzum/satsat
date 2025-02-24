@@ -4,7 +4,9 @@
 
 #include "include/VariableClauseRelation.h"
 
+#include <algorithm>
 #include <iostream>
+#include <utility>
 
 
 VariableClauseRelation::VariableClauseRelation() {
@@ -24,6 +26,11 @@ long VariableClauseRelation::addVariableToClause(long clauseId, bool polarity) {
         v.emplace_back(clauseId, polarity);
         variableToClauseMap.push_back(v);
         clausesToVariableMap.at(clauseId).emplace_back(newVarId, polarity);
+        if (polarity) {
+            variables.emplace_back(newVarId, 0, 1);
+        } else {
+            variables.emplace_back(newVarId, 1, 0);
+        }
         return newVarId;
     } else {
         throw std::runtime_error("Clause does not exist");
@@ -39,6 +46,11 @@ void VariableClauseRelation::addVariableToClause(long clauseId, long varId, bool
     }
     variableToClauseMap.at(varId).emplace_back(clauseId, polarity);
     clausesToVariableMap.at(clauseId).emplace_back(varId, polarity);
+    if (polarity) {
+        variables.at(varId).positive_occurences++;
+    } else {
+        variables.at(varId).negative_occurences++;
+    }
 }
 
 std::vector<std::pair<long, bool>>& VariableClauseRelation::getClausesOfVariable(long varId) {
@@ -55,4 +67,10 @@ std::vector<std::pair<long, bool>>& VariableClauseRelation::getVariablesOfClause
     } else {
         throw std::runtime_error("Clause does not exist");
     }
+}
+
+CNFFormula VariableClauseRelation::setupFormula(std::map<long, long> fileToInternalVar, std::map<long, long> internalToFileVar) {
+    std::make_heap(variables.begin(), variables.end(), variable_comparison);
+    CNFFormula c(clausesToVariableMap, variableToClauseMap, variables, std::move(fileToInternalVar), std::move(internalToFileVar));
+    return c;
 }

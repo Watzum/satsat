@@ -44,7 +44,7 @@ void variabletest() {
         std::cout << i.id << std::endl;
     }
 
-    ranges::sort(v, variable_comparison);
+    std::make_heap(v.begin(), v.end(), variable_comparison);
 
     std::cout << std::endl;
 
@@ -55,5 +55,6 @@ void variabletest() {
 
 
 int main() {
+    d_r();
     variabletest();
 }

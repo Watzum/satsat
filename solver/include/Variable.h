@@ -5,7 +5,7 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 
-
+#include <string>
 
 class Variable {
 public:
@@ -22,10 +22,18 @@ public:
             return negative_occurences;
         }
     }
+
+    [[nodiscard]] std::string to_string() const {
+        std::string s = "Id: ";
+        s += std::to_string(id) + "; negative Occurences: ";
+        s += std::to_string(negative_occurences) + "; positive Occurences";
+        s += std::to_string(positive_occurences);
+        return s;
+    }
 };
 
 inline bool variable_comparison(const Variable& a, const Variable& b) {
-    return a.getCompareValue() < b.getCompareValue();
+    return a.getCompareValue() > b.getCompareValue();
 }
 
 #endif //VARIABLE_H
