@@ -14,8 +14,9 @@
 
 
 namespace dimacs {
-    void solve(const std::string &) {
+    void solve(const std::string& filePath) {
         DimacsReader reader;
+        CNFFormula cnf = reader.readFile(filePath);
 
     }
 

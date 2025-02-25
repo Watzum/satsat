@@ -16,7 +16,7 @@ public:
     CNFFormula(std::vector<std::vector<std::pair<long, bool>>> a, std::vector<std::vector<std::pair<long, bool>>> b,
         std::vector<Variable> c, std::map<long, long> d, std::map<long, long> e) :
                 clausesToVariableMap(std::move(a)), variableToClauseMap(std::move(b)),
-                variables(std::move(c)), fileToInternalVar(std::move(d)), internalToFileVar(std::move(e)) {};
+                variables_heap(std::move(c)), fileToInternalVar(std::move(d)), internalToFileVar(std::move(e)) {};
 
     long getFileVarOf(long internalVar);
     long getInternalVarOf(long fileVar);
@@ -27,7 +27,7 @@ public:
 private:
     std::vector<std::vector<std::pair<long, bool>>> clausesToVariableMap;
     std::vector<std::vector<std::pair<long, bool>>> variableToClauseMap;
-    std::vector<Variable> variables;
+    std::vector<Variable> variables_heap;
     std::map<long, long> fileToInternalVar;
     std::map<long, long> internalToFileVar;
 };
