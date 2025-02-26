@@ -8,26 +8,30 @@
 #include <utility>
 #include <vector>
 
+#include "Clause.h"
 #include "Variable.h"
 
 
 class CNFFormula {
 public:
-    CNFFormula(std::vector<std::vector<std::pair<long, bool>>> a, std::vector<std::vector<std::pair<long, bool>>> b,
-        std::vector<Variable> c, std::map<long, long> d, std::map<long, long> e) :
+    CNFFormula(std::vector<Clause> a, std::vector<Variable> b, std::map<long, long> c, std::map<long, long> d) :
                 clausesToVariableMap(std::move(a)), variableToClauseMap(std::move(b)),
-                variables_heap(std::move(c)), fileToInternalVar(std::move(d)), internalToFileVar(std::move(e)) {};
+                fileToInternalVar(std::move(c)), internalToFileVar(std::move(d)) {};
 
-    long getFileVarOf(long internalVar);
-    long getInternalVarOf(long fileVar);
+    long getFileVarOf(long internalVar) const;
+    long getInternalVarOf(long fileVar) const;
+    Variable* peekVariable();
+    void splitOnVariable(Variable*, bool);
     //pre: varId >= 0
-    std::vector<std::pair<long, bool>>& getClausesOfVariable(long varId);
+    Variable& getVariable(long varId);
     //pre: clauseId >= 0
-    std::vector<std::pair<long, bool>>& getVariablesOfClause(long clauseId);
+    Clause& getClause(long clauseId);
+    //TODO: void removeVarFromClause(long varId, long clauseId);
+    void removeClause(long clauseId);
+
 private:
-    std::vector<std::vector<std::pair<long, bool>>> clausesToVariableMap;
-    std::vector<std::vector<std::pair<long, bool>>> variableToClauseMap;
-    std::vector<Variable> variables_heap;
+    std::vector<Clause> clausesToVariableMap;
+    std::vector<Variable> variableToClauseMap;
     std::map<long, long> fileToInternalVar;
     std::map<long, long> internalToFileVar;
 };

@@ -17,7 +17,10 @@ namespace dimacs {
     void solve(const std::string& filePath) {
         DimacsReader reader;
         CNFFormula cnf = reader.readFile(filePath);
-
+        Variable* v = cnf.peekVariable();
+        while (v != nullptr && v->isPure()) {
+            
+        }
     }
 
     //only works with non-negative integers

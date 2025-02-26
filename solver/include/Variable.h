@@ -6,30 +6,30 @@
 #define VARIABLE_H
 
 #include <string>
+#include <unordered_map>
 
 class Variable {
 public:
-    Variable(long i, long n, long p) : id(i), negative_occurences(n), positive_occurences(p) {}
+    explicit Variable(long i, long f) : internal_id{i}, file_id{f}, negative_occurrences(0), positive_occurrences(0) {}
+    //TODO...
+    explicit Variable(long i) : internal_id{i}, file_id{-1}, negative_occurrences(0), positive_occurrences(0) {}
 
-    long id;
-    long negative_occurences;
-    long positive_occurences;
+    void addClause(long clauseId, bool polarity);
+    void removeClause(long clauseId);
 
-    [[nodiscard]] long getCompareValue() const {
-        if (negative_occurences > positive_occurences) {
-            return positive_occurences;
-        } else {
-            return negative_occurences;
-        }
-    }
+    [[nodiscard]] long getInternalId() const;
+    [[nodiscard]] size_t getNumberOfClauses() const;
+    [[nodiscard]] long getCompareValue() const;
+    [[nodiscard]] std::string to_string() const;
+    [[nodiscard]] bool isPure() const;
+    [[nodiscard]] bool getPolarity() const;
 
-    [[nodiscard]] std::string to_string() const {
-        std::string s = "Id: ";
-        s += std::to_string(id) + "; negative Occurences: ";
-        s += std::to_string(negative_occurences) + "; positive Occurences";
-        s += std::to_string(positive_occurences);
-        return s;
-    }
+private:
+    std::unordered_map<long, bool> clauses;
+    long internal_id;
+    long file_id;
+    long negative_occurrences;
+    long positive_occurrences;
 };
 
 inline bool variable_comparison(const Variable& a, const Variable& b) {

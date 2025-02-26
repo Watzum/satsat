@@ -8,6 +8,7 @@
 #include <vector>
 #include <utility>
 
+#include "Clause.h"
 #include "CNFFormula.h"
 #include "Variable.h"
 
@@ -20,8 +21,8 @@ class VariableClauseRelation {
 
         CNFFormula setupFormula(std::map<long, long>, std::map<long, long>);
     private:
-        std::vector<std::vector<std::pair<long, bool>>> clausesToVariableMap;
-        std::vector<std::vector<std::pair<long, bool>>> variableToClauseMap;
+        std::vector<Clause> clausesToVariableMap;
+        std::vector<Variable> variableToClauseMap;
         std::vector<Variable> variables;
 };
 
