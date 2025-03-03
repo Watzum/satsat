@@ -13,7 +13,8 @@ public:
     void addVariable(long varId, bool polarity);
     bool removeVariable(long varId);
     bool isEmpty() const;
-    std::pair<std::unordered_map<long, bool>::const_iterator, std::unordered_map<long, bool>::const_iterator> const_iter();
+    std::unordered_map<long,bool>::const_iterator begin();
+    std::unordered_map<long,bool>::const_iterator end();
 
 
 private:

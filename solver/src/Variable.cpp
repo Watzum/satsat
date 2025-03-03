@@ -33,17 +33,14 @@ size_t Variable::getNumberOfClauses() const {
 }
 
 long Variable::getCompareValue() const {
-    if (negative_occurrences > positive_occurrences) {
-        return positive_occurrences;
-    } else {
-        return negative_occurrences;
-    }
+    return std::min(positive_occurrences, negative_occurrences);
 }
 
 std::string Variable::to_string() const {
     std::string s = "Id: ";
-    s += std::to_string(internal_id) + "; negative Occurrences: ";
-    s += std::to_string(negative_occurrences) + "; positive Occurrences";
+    s += std::to_string(internal_id) + "; file_id: ";
+    s += std::to_string(file_id) + "; negative Occurrences: ";
+    s += std::to_string(negative_occurrences) + "; positive Occurrences: ";
     s += std::to_string(positive_occurrences);
     return s;
 }
@@ -58,4 +55,8 @@ bool Variable::getPolarity() const {
         return true;
     }
     return false;
+}
+
+bool Variable::operator<(const Variable& v) const {
+    return getCompareValue() < v.getCompareValue();
 }

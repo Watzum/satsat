@@ -9,22 +9,19 @@
 #include <utility>
 
 
-VariableClauseRelation::VariableClauseRelation() {
-    //std::cout << "New VariableClauseRelation" << '\n';
-}
+VariableClauseRelation::VariableClauseRelation() = default;
 
 long VariableClauseRelation::addClause() {
-    clausesToVariableMap.emplace_back();
-    return clausesToVariableMap.size() - 1;
+    clauses.emplace_back();
+    return clauses.size() - 1;
 }
 
-long VariableClauseRelation::addVariableToClause(long clauseId, bool polarity) {
-    if (clausesToVariableMap.size() > clauseId) {
-        long newVarId = variableToClauseMap.size();
-        Variable v(newVarId);
+long VariableClauseRelation::addNewVariableToClause(long clauseId, bool polarity, long fileVarId) {
+    if (clauses.size() > clauseId) {
+        long newVarId = variables.size();
+        Variable& v = variables.emplace_back(newVarId, fileVarId);
         v.addClause(clauseId, polarity);
-        variableToClauseMap.push_back(v);
-        clausesToVariableMap.at(clauseId).addVariable(newVarId, polarity);
+        clauses.at(clauseId).addVariable(newVarId, polarity);
         return newVarId;
     } else {
         throw std::runtime_error("Clause does not exist");
@@ -32,18 +29,17 @@ long VariableClauseRelation::addVariableToClause(long clauseId, bool polarity) {
 }
 
 void VariableClauseRelation::addVariableToClause(long clauseId, long varId, bool polarity) {
-    if (variableToClauseMap.size() <= varId) {
+    if (variables.size() <= varId) {
         throw std::out_of_range("Variable Id out of range!");
     }
-    if (clausesToVariableMap.size() <= clauseId) {
+    if (clauses.size() <= clauseId) {
         throw std::out_of_range("Clause Id out of range!");
     }
-    variableToClauseMap.at(varId).addClause(clauseId, polarity);
-    clausesToVariableMap.at(clauseId).addVariable(varId, polarity);
+    variables.at(varId).addClause(clauseId, polarity);
+    clauses.at(clauseId).addVariable(varId, polarity);
 }
 
 CNFFormula VariableClauseRelation::setupFormula(std::map<long, long> fileToInternalVar, std::map<long, long> internalToFileVar) {
-    //std::make_heap(variables.begin(), variables.end(), variable_comparison);
-    CNFFormula c(clausesToVariableMap, variableToClauseMap, std::move(fileToInternalVar), std::move(internalToFileVar));
+    CNFFormula c(clauses, variables, std::move(fileToInternalVar), std::move(internalToFileVar));
     return c;
 }

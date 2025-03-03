@@ -5,6 +5,7 @@
 #ifndef VARIABLECLAUSERELATION_H
 #define VARIABLECLAUSERELATION_H
 
+#include <unordered_set>
 #include <vector>
 #include <utility>
 
@@ -16,13 +17,12 @@ class VariableClauseRelation {
     public:
         VariableClauseRelation();
         long addClause();
-        long addVariableToClause(long clauseId, bool polarity);
+        long addNewVariableToClause(long clauseId, bool polarity, long fileVarId);
         void addVariableToClause(long clauseId, long varId, bool polarity);
 
         CNFFormula setupFormula(std::map<long, long>, std::map<long, long>);
     private:
-        std::vector<Clause> clausesToVariableMap;
-        std::vector<Variable> variableToClauseMap;
+        std::vector<Clause> clauses;
         std::vector<Variable> variables;
 };
 

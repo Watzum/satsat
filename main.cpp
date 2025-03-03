@@ -18,7 +18,7 @@ using namespace std;
 void test1() {
     DimacsReader d;
     CNFFormula c = d.readFile("../dimacsTest.dimacs");
-    c.removeClause(1);
+    c.splitOnVariable(nullptr, false);
 }
 
 

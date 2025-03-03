@@ -4,7 +4,6 @@
 
 #include "../include/CNFFormula.h"
 
-#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 
@@ -25,9 +24,15 @@ Variable* CNFFormula::peekVariable() {
 
 void CNFFormula::splitOnVariable(Variable * var, bool pol) {
     /*for (auto clause : getClausesOfVariable(var->getInternalId())) {
-        
+
     }*/
     //TODO...
+    while (!splitQueue.empty()) {
+        auto p = splitQueue.back();
+        std::ranges::pop_heap(splitQueue);
+        splitQueue.pop_back();
+        std::cout << p->to_string() << std::endl;
+    }
 }
 
 Variable& CNFFormula::getVariable(long varId) {
@@ -48,8 +53,9 @@ Clause& CNFFormula::getClause(long clauseId) {
 
 void CNFFormula::removeClause(long clauseId) {
     Clause c = clausesToVariableMap.at(clauseId);
-    auto p = c.const_iter();
-    for (auto it = p.first; it != p.second; ++it) {
-        std::cout << it->first << std::endl;
+    for (auto it : c) {
+        Variable& v = variableToClauseMap.at(it.first);
+        v.removeClause(clauseId);
     }
+    clausesToVariableMap.erase(clausesToVariableMap.begin() + clauseId);
 }

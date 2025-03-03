@@ -16,6 +16,10 @@ bool Clause::isEmpty() const {
     return variables.empty();
 }
 
-std::pair<std::unordered_map<long, bool>::const_iterator, std::unordered_map<long, bool>::const_iterator> Clause::const_iter() {
-    return std::make_pair(variables.begin(), variables.end());
+std::unordered_map<long, bool>::const_iterator Clause::begin() {
+    return variables.begin();
+}
+
+std::unordered_map<long, bool>::const_iterator Clause::end() {
+    return variables.end();
 }

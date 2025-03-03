@@ -85,7 +85,7 @@ CNFFormula DimacsReader::readClauses() {
             if (auto search = fileToInternal.find(var_file_number); search != fileToInternal.end()) {
                 relation.addVariableToClause(currentClause, search->second, polarity);
             } else {
-                long new_var_id = relation.addVariableToClause(currentClause, polarity);
+                long new_var_id = relation.addNewVariableToClause(currentClause, polarity, var_file_number);
                 fileToInternal.emplace(var_file_number, new_var_id);
                 internalToFile.emplace(new_var_id, var_file_number);
             }
