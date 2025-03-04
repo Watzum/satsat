@@ -56,7 +56,3 @@ bool Variable::getPolarity() const {
     }
     return false;
 }
-
-bool Variable::operator<(const Variable& v) const {
-    return getCompareValue() < v.getCompareValue();
-}

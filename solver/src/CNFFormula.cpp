@@ -23,15 +23,12 @@ Variable* CNFFormula::peekVariable() {
 }
 
 void CNFFormula::splitOnVariable(Variable * var, bool pol) {
-    /*for (auto clause : getClausesOfVariable(var->getInternalId())) {
-
-    }*/
-    //TODO...
     while (!splitQueue.empty()) {
-        auto p = splitQueue.back();
-        std::ranges::pop_heap(splitQueue);
+        auto p = splitQueue.at(0);
+        std::ranges::pop_heap(splitQueue, dimacs::purity_comparison());
         splitQueue.pop_back();
-        std::cout << p->to_string() << std::endl;
+        std::cout << "Popped: " << p->to_string() << std::endl;
+        std::cout << std::endl;
     }
 }
 

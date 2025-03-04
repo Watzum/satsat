@@ -23,7 +23,6 @@ public:
     [[nodiscard]] std::string to_string() const;
     [[nodiscard]] bool isPure() const;
     [[nodiscard]] bool getPolarity() const;
-    bool operator<(const Variable& v) const;
 
 private:
     std::unordered_map<long, bool> clauses;

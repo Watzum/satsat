@@ -15,10 +15,7 @@ namespace dimacs {
     void ignore_whitespaces(std::ifstream&);
     struct purity_comparison {
         bool operator()(const Variable* const a, const Variable* const b) {
-            if (a->getCompareValue() < b->getCompareValue()) {
-                return false;
-            }
-            return true;
+            return a->getCompareValue() > b->getCompareValue();
         }
     };
 }

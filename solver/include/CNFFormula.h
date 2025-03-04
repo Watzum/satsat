@@ -24,11 +24,7 @@ public:
             splitQueue.push_back(&it);
         }
         //std::ranges::make_heap(splitQueue, dimacs::purity_comparison());
-        std::ranges::make_heap(splitQueue);
-        for (auto p : splitQueue) {
-            std::cout << p->to_string() << std::endl;
-        }
-        std::cout << std::endl;
+        std::make_heap(splitQueue.begin(), splitQueue.end(), dimacs::purity_comparison());
     };
 
     long getFileVarOf(long internalVar) const;
