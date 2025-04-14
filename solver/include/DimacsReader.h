@@ -7,18 +7,19 @@
 #include <fstream>
 #include <string>
 
-#include "VariableClauseRelation.h"
+#include "CNFFormula.h"
+
 
 class DimacsReader {
     public:
-        DimacsReader();
-        CNFFormula readFile(const std::string &filePath);
+        explicit DimacsReader(CNFFormula& formula);
+        void readFile(const std::string &filePath);
     private:
-        VariableClauseRelation relation;
+        CNFFormula& relation;
         std::ifstream fileReader = nullptr;
 
         void readHeader();
-        CNFFormula readClauses();
+        void readClauses();
 
 };
 

@@ -10,15 +10,13 @@
 
 class Clause {
 public:
-    void addVariable(long varId, bool polarity);
-    bool removeVariable(long varId);
+    void addVariable(size_t varId, bool polarity);
+    bool removeVariable(size_t varId);
     bool isEmpty() const;
-    std::unordered_map<long,bool>::const_iterator begin();
-    std::unordered_map<long,bool>::const_iterator end();
-
-
+    std::unordered_map<size_t,bool>::const_iterator begin();
+    std::unordered_map<size_t,bool>::const_iterator end();
 private:
-    std::unordered_map<long, bool> variables;
+    std::unordered_map<size_t, bool> variables;
 };
 
 

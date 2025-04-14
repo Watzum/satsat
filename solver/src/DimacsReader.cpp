@@ -3,7 +3,6 @@
 //
 
 #include "include/DimacsReader.h"
-#include "include/VariableClauseRelation.h"
 
 #include <iostream>
 #include <map>
@@ -13,18 +12,17 @@
 #include "include/Dimacs.h"
 #include "include/DimacsFormatException.h"
 
-DimacsReader::DimacsReader(): relation() {}
+DimacsReader::DimacsReader(CNFFormula& formula): relation(formula) {}
 
 
-CNFFormula DimacsReader::readFile(const std::string& filePath) {
+void DimacsReader::readFile(const std::string& filePath) {
     fileReader = std::ifstream{filePath};
     if (!fileReader) {
         throw std::runtime_error("Could not open dimacs file!");
     }
     readHeader();
-    CNFFormula c = readClauses();
+    readClauses();
     fileReader.close();
-    return c;
 }
 
 
@@ -57,15 +55,14 @@ void DimacsReader::readHeader() {
     }
 }
 
-CNFFormula DimacsReader::readClauses() {
+void DimacsReader::readClauses() {
     std::map<long, long> fileToInternal;
-    std::map<long, long> internalToFile;
     std::string strInput{};
     std::string clause{};
     long currentClause = -1;
     while (fileReader >> strInput) {
         if (currentClause == -1) {
-            currentClause = relation.addClause();
+            currentClause = relation.addNewClause();
         }
         if (strInput == "0") {
             if (currentClause == -1) {
@@ -73,26 +70,25 @@ CNFFormula DimacsReader::readClauses() {
             }
             currentClause = -1;
         } else {
-            long var_file_number; //file number of a variable may differ from the internal id
+            long varFileNumber; //file number of a variable may differ from the internal id
             bool polarity;
             if (strInput.at(0) == '-') {
-                var_file_number = dimacs::to_positive_long(strInput.substr(1));
+                varFileNumber = dimacs::to_positive_long(strInput.substr(1));
                 polarity = false;
             } else {
-                var_file_number = dimacs::to_positive_long(strInput);
+                varFileNumber = dimacs::to_positive_long(strInput);
                 polarity = true;
             }
-            if (auto search = fileToInternal.find(var_file_number); search != fileToInternal.end()) {
-                relation.addVariableToClause(currentClause, search->second, polarity);
+            if (auto search = fileToInternal.find(varFileNumber); search != fileToInternal.end()) {
+                relation.addVariableToClause(search->second, currentClause, polarity);
             } else {
-                long new_var_id = relation.addNewVariableToClause(currentClause, polarity, var_file_number);
-                fileToInternal.emplace(var_file_number, new_var_id);
-                internalToFile.emplace(new_var_id, var_file_number);
+                size_t internalVarId = relation.addNewVariable();
+                relation.addVariableToClause(internalVarId, currentClause, polarity);
+                fileToInternal.emplace(varFileNumber, internalVarId);
             }
         }
     }
     if (currentClause != -1) {
         throw DimacsFormatException("Expected 0 at the end of file");
     }
-    return relation.setupFormula(std::move(fileToInternal), std::move(internalToFile));
 }

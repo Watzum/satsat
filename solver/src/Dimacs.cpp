@@ -10,17 +10,11 @@
 
 #include "include/DimacsFormatException.h"
 #include "include/DimacsReader.h"
-#include "include/VariableClauseRelation.h"
 
 
 namespace dimacs {
     void solve(const std::string& filePath) {
-        DimacsReader reader;
-        CNFFormula cnf = reader.readFile(filePath);
-        Variable* v = cnf.peekVariable();
-        while (v != nullptr && v->isPure()) {
-            
-        }
+        //TODO
     }
 
     //only works with non-negative integers

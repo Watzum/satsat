@@ -7,52 +7,84 @@
 #include <iostream>
 #include <stdexcept>
 
-long CNFFormula::getFileVarOf(long internalVar) const {
-    return internalToFileVar.at(internalVar);
-}
-
-long CNFFormula::getInternalVarOf(long fileVar) const {
-    return fileToInternalVar.at(fileVar);
-}
-
+/*
 Variable* CNFFormula::peekVariable() {
-    if (variableToClauseMap.size() != 0) {
-        return &variableToClauseMap.at(0);
+    if (splitQueue.empty()) {
+        return nullptr;
     }
-    return nullptr;
+    return splitQueue.at(0);
 }
 
-void CNFFormula::splitOnVariable(Variable * var, bool pol) {
-    while (!splitQueue.empty()) {
-        auto p = splitQueue.at(0);
-        std::ranges::pop_heap(splitQueue, dimacs::purity_comparison());
+void CNFFormula::splitOnNextVariable(bool pol) {
+
+    Variable* v = splitQueue.at(0);
+    if (v != nullptr) {
+        for (auto clause : *v) {
+            if (clause.second == pol) {
+                clausesToVariableMap.erase(clausesToVariableMap.begin() + clause.first);
+            } else {
+                v->removeClause(clause.first);
+            }
+        }
+        std::pop_heap(splitQueue.begin(), splitQueue.end(), dimacs::purity_comparison());
         splitQueue.pop_back();
-        std::cout << "Popped: " << p->to_string() << std::endl;
-        std::cout << std::endl;
     }
-}
+}*/
 
 Variable& CNFFormula::getVariable(long varId) {
-    if (variableToClauseMap.size() > varId) {
-        return variableToClauseMap.at(varId);
-    } else {
-        throw std::runtime_error("Variable does not exist");
+    if (variables.size() > varId) {
+        return variables.at(varId);
     }
+    throw std::runtime_error("Variable " + std::to_string(varId) + " does not exist");
 }
+
+
+size_t CNFFormula::addNewVariable() {
+    variables.emplace_back();
+    return variables.size() - 1;
+}
+
+
+void CNFFormula::addVariableToClause(size_t varId, size_t clauseId, bool polarity) {
+    Variable& v = variables.at(varId);
+    v.addClause(clauseId, polarity);
+    Clause& c = clauses.at(clauseId);
+    c.addVariable(varId, polarity);
+}
+
+
+void CNFFormula::removeVariableFromClause(size_t varId, size_t clauseId) {
+    Variable& v = variables.at(varId);
+    v.removeClause(clauseId);
+    Clause& c = clauses.at(clauseId);
+    c.removeVariable(varId);
+}
+
 
 Clause& CNFFormula::getClause(long clauseId) {
-    if (clausesToVariableMap.size() > clauseId) {
-        return clausesToVariableMap.at(clauseId);
-    } else {
-        throw std::runtime_error("Clause does not exist");
+    if (clauses.size() > clauseId) {
+        return clauses.at(clauseId);
     }
+    throw std::runtime_error("Clause " + std::to_string(clauseId) + " does not exist");
 }
 
+
+size_t CNFFormula::addNewClause() {
+    clauses.emplace_back();
+    return clauses.size() - 1;
+}
+
+
 void CNFFormula::removeClause(long clauseId) {
-    Clause c = clausesToVariableMap.at(clauseId);
+    Clause c = clauses.at(clauseId);
     for (auto it : c) {
-        Variable& v = variableToClauseMap.at(it.first);
+        Variable& v = variables.at(it.first);
         v.removeClause(clauseId);
     }
-    clausesToVariableMap.erase(clausesToVariableMap.begin() + clauseId);
+    clauses.erase(clauses.begin() + clauseId);
+}
+
+
+bool CNFFormula::isEmptyClause() {
+    return clauses.empty();
 }
