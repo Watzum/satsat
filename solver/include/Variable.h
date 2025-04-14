@@ -14,10 +14,10 @@ public:
     Variable() : negative_occurrences(0), positive_occurrences(0) {}
 
     void addClause(size_t clauseId, bool polarity);
-    void removeClause(long clauseId);
+    void removeClause(size_t clauseId);
 
-    std::unordered_map<long,bool>::const_iterator begin();
-    std::unordered_map<long,bool>::const_iterator end();
+    std::unordered_map<size_t,bool>::const_iterator begin();
+    std::unordered_map<size_t,bool>::const_iterator end();
 
     [[nodiscard]] size_t getNumberOfClauses() const;
     [[nodiscard]] long getCompareValue() const;
@@ -26,7 +26,7 @@ public:
     [[nodiscard]] bool getPolarity() const;
 
 private:
-    std::unordered_map<long, bool> clauses;
+    std::unordered_map<size_t, bool> clauses;
     long negative_occurrences;
     long positive_occurrences;
 };

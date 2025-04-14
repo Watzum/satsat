@@ -15,7 +15,7 @@ void Variable::addClause(size_t clauseId, bool polarity) {
 }
 
 
-void Variable::removeClause(long clauseId) {
+void Variable::removeClause(size_t clauseId) {
     bool p = clauses.at(clauseId);
     clauses.erase(clauseId);
     if (p) {
@@ -58,11 +58,11 @@ bool Variable::getPolarity() const {
 }
 
 
-std::unordered_map<long, bool>::const_iterator Variable::begin() {
+std::unordered_map<size_t, bool>::const_iterator Variable::begin() {
     return clauses.begin();
 }
 
 
-std::unordered_map<long, bool>::const_iterator Variable::end() {
+std::unordered_map<size_t, bool>::const_iterator Variable::end() {
     return clauses.end();
 }
