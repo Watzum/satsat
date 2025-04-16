@@ -25,6 +25,16 @@ void Variable::removeClause(size_t clauseId) {
     }
 }
 
+std::unordered_map<size_t, bool>::iterator Variable::removeClause(std::unordered_map<size_t, bool>::iterator it) {
+    bool p = clauses.at(it->first);
+    if (p) {
+        positive_occurrences--;
+    } else {
+        negative_occurrences--;
+    }
+    return clauses.erase(it);
+}
+
 
 size_t Variable::getNumberOfClauses() const {
     return clauses.size();
@@ -58,11 +68,11 @@ bool Variable::getPolarity() const {
 }
 
 
-std::unordered_map<size_t, bool>::const_iterator Variable::begin() {
+std::unordered_map<size_t, bool>::iterator Variable::begin() {
     return clauses.begin();
 }
 
 
-std::unordered_map<size_t, bool>::const_iterator Variable::end() {
+std::unordered_map<size_t, bool>::iterator Variable::end() {
     return clauses.end();
 }

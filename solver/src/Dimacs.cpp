@@ -14,7 +14,13 @@
 
 namespace dimacs {
     void solve(const std::string& filePath) {
-        //TODO
+        CNFFormula formula;
+        DimacsReader reader(formula);
+        reader.readFile(filePath);
+        std::vector<varAssignment> currentAssignment(formula.getVariableCount(), UNKNOWN);
+
+
+
     }
 
     //only works with non-negative integers

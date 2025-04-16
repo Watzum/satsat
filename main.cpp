@@ -6,18 +6,22 @@
 #include <iostream>
 #include <string>
 
-#include "include/Variable.h"
-#include "solver/include/DimacsReader.h"
-#include "solver/include/VariableClauseRelation.h"
-
+#include "include/DimacsReader.h"
 
 using namespace std;
 
 void test1() {
-    CNFFormula c;
-    DimacsReader d(c);
-    d.readFile("../dimacsTest.dimacs");
-    cout << c.isEmptyClause() << endl;
+    CNFFormula f;
+    auto c1 = f.addNewClause();
+
+    auto v1 = f.addNewVariable();
+    auto v2 = f.addNewVariable();
+
+    f.addVariableToClause(v1, c1, true);
+    f.addVariableToClause(v2, c1, false);
+
+    std::cout << f.assignVariable(v1, false) << std::endl;
+    std::cout << f.assignVariable(v2, true) << std::endl;
 }
 
 

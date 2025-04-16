@@ -112,6 +112,20 @@ TEST(Test1Suite, CNFFormulaCopyConstructor) {
     ASSERT_TRUE(!f3.getClause(c).isEmpty());
 }
 
+TEST(Test1Suite, CNFFormulaAssignment) {
+    CNFFormula f;
+    auto c1 = f.addNewClause();
+
+    auto v1 = f.addNewVariable();
+    auto v2 = f.addNewVariable();
+
+    f.addVariableToClause(v1, c1, true);
+    f.addVariableToClause(v2, c1, false);
+
+    ASSERT_TRUE(f.assignVariable(v1, false));
+    ASSERT_TRUE(!f.assignVariable(v2, true));
+}
+
 /*TEST(Test1Suite, CorrectFormulaRepresentation1) {
     DimacsReader reader;
     CNFFormula c{reader.readFile("../../Google_tests/dimacsFiles/DimacsTest2.dimacs")};

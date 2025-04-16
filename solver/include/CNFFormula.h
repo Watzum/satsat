@@ -35,8 +35,13 @@ public:
     Clause& getClause(long clauseId);
     //TODO: void removeVarFromClause(long varId, long clauseId);
     size_t addNewClause();
-    void removeClause(long clauseId);
+    void removeClause(size_t clauseId);
     bool isEmptySet();
+
+    size_t getVariableCount();
+
+    //returns false if assignment results in empty clause <=> unsat assignment
+    bool assignVariable(size_t varId, bool polarity);
 
 
 private:

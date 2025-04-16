@@ -10,6 +10,7 @@
 #include "Variable.h"
 
 namespace dimacs {
+    enum varAssignment {TRUE, FALSE, UNKNOWN};
     void solve(const std::string&);
     long to_positive_long(const std::string&);
     void ignore_whitespaces(std::ifstream&);

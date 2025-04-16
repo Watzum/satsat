@@ -15,9 +15,10 @@ public:
 
     void addClause(size_t clauseId, bool polarity);
     void removeClause(size_t clauseId);
+    std::unordered_map<size_t, bool>::iterator removeClause(std::unordered_map<size_t, bool>::iterator clauseId);
 
-    std::unordered_map<size_t,bool>::const_iterator begin();
-    std::unordered_map<size_t,bool>::const_iterator end();
+    std::unordered_map<size_t,bool>::iterator begin();
+    std::unordered_map<size_t,bool>::iterator end();
 
     [[nodiscard]] size_t getNumberOfClauses() const;
     [[nodiscard]] long getCompareValue() const;

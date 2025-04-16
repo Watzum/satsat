@@ -81,7 +81,7 @@ size_t CNFFormula::addNewClause() {
 }
 
 
-void CNFFormula::removeClause(long clauseId) {
+void CNFFormula::removeClause(size_t clauseId) {
     Clause c = clauses.at(clauseId);
     for (auto it : c) {
         Variable& v = variables.at(it.first);
@@ -93,4 +93,26 @@ void CNFFormula::removeClause(long clauseId) {
 
 bool CNFFormula::isEmptySet() {
     return clauses.empty();
+}
+
+size_t CNFFormula::getVariableCount() {
+    return variables.size();
+}
+
+bool CNFFormula::assignVariable(size_t varId, bool polarity) {
+    Variable& v = variables.at(varId);
+    bool returnValue = true;
+    for (auto it = v.begin(); it != v.end();) {
+        size_t clauseId = it->first;
+        bool clausePolarity = it->second;
+        it = v.removeClause(it);
+        clauses.at(clauseId).removeVariable(varId);
+        if (clauses.at(clauseId).isEmpty()) {
+            returnValue = false;
+        }
+        if (clausePolarity == polarity) {
+            removeClause(clauseId);
+        }
+    }
+    return returnValue;
 }
