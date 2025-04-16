@@ -10,13 +10,18 @@
 
 class Clause {
 public:
+    Clause() : satisfied(false) {}
     void addVariable(size_t varId, bool polarity);
     bool removeVariable(size_t varId);
     bool isEmpty() const;
+    bool isSatisfied() const;
+    void setSatisfied();
     std::unordered_map<size_t,bool>::const_iterator begin();
     std::unordered_map<size_t,bool>::const_iterator end();
+
 private:
     std::unordered_map<size_t, bool> variables;
+    bool satisfied;
 };
 
 

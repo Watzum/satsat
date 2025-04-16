@@ -13,7 +13,15 @@ bool Clause::removeVariable(size_t varId) {
 }
 
 bool Clause::isEmpty() const {
-    return variables.empty();
+    return variables.empty() && !satisfied;
+}
+
+bool Clause::isSatisfied() const {
+    return satisfied;
+}
+
+void Clause::setSatisfied() {
+    satisfied = true;
 }
 
 std::unordered_map<size_t, bool>::const_iterator Clause::begin() {

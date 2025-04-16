@@ -124,6 +124,19 @@ TEST(Test1Suite, CNFFormulaAssignment) {
 
     ASSERT_TRUE(f.assignVariable(v1, false));
     ASSERT_TRUE(!f.assignVariable(v2, true));
+
+    CNFFormula f2;
+
+    c1 = f2.addNewClause();
+
+    v1 = f2.addNewVariable();
+    f2.addVariableToClause(v1, c1, true);
+
+    CNFFormula f3 = f2;
+    ASSERT_TRUE(f2.assignVariable(v1, true));
+    ASSERT_FALSE(f3.assignVariable(v1, false));
+    ASSERT_TRUE(f2.isEmptySet());
+    ASSERT_FALSE(f3.isEmptySet());
 }
 
 /*TEST(Test1Suite, CorrectFormulaRepresentation1) {

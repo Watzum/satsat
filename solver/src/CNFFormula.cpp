@@ -87,7 +87,7 @@ void CNFFormula::removeClause(size_t clauseId) {
         Variable& v = variables.at(it.first);
         v.removeClause(clauseId);
     }
-    clauses.erase(clauses.begin() + clauseId);
+    clauses.at(clauseId).setSatisfied();
 }
 
 
@@ -100,6 +100,7 @@ size_t CNFFormula::getVariableCount() {
 }
 
 bool CNFFormula::assignVariable(size_t varId, bool polarity) {
+    std::cout << "Branching Variable " << varId << " " << polarity << '\n';
     Variable& v = variables.at(varId);
     bool returnValue = true;
     for (auto it = v.begin(); it != v.end();) {
@@ -107,11 +108,10 @@ bool CNFFormula::assignVariable(size_t varId, bool polarity) {
         bool clausePolarity = it->second;
         it = v.removeClause(it);
         clauses.at(clauseId).removeVariable(varId);
-        if (clauses.at(clauseId).isEmpty()) {
-            returnValue = false;
-        }
         if (clausePolarity == polarity) {
             removeClause(clauseId);
+        } else if (clauses.at(clauseId).isEmpty()) {
+            returnValue = false;
         }
     }
     return returnValue;
