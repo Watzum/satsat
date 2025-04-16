@@ -18,6 +18,9 @@
 class CNFFormula {
 public:
 
+    CNFFormula() = default;
+    CNFFormula(const CNFFormula& c) = default;
+
     //Variable* peekVariable();
     //void splitOnNextVariable(bool polarity);
 
@@ -33,7 +36,7 @@ public:
     //TODO: void removeVarFromClause(long varId, long clauseId);
     size_t addNewClause();
     void removeClause(long clauseId);
-    bool isEmptyClause();
+    bool isEmptySet();
 
 
 private:

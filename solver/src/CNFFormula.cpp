@@ -31,6 +31,12 @@ void CNFFormula::splitOnNextVariable(bool pol) {
     }
 }*/
 
+/*
+CNFFormula::CNFFormula(const CNFFormula& c) {
+    clauses = c.clauses;
+    variables = c.variables;
+}*/
+
 Variable& CNFFormula::getVariable(long varId) {
     if (variables.size() > varId) {
         return variables.at(varId);
@@ -85,6 +91,6 @@ void CNFFormula::removeClause(long clauseId) {
 }
 
 
-bool CNFFormula::isEmptyClause() {
+bool CNFFormula::isEmptySet() {
     return clauses.empty();
 }

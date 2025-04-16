@@ -25,14 +25,58 @@ TEST(Test1Suite, ToPositiveLong) {
 TEST(Test1Suite, DimacsReaderPositive1) {
     CNFFormula rel;
     DimacsReader reader(rel);
-
-    //ASSERT_NO_THROW(reader.readFile("../../Google_tests/dimacsFiles/DimacsTest1.dimacs"));
     reader.readFile("../../Google_tests/dimacsFiles/DimacsTest1.dimacs");
-    //ASSERT_EQ(rel.getVariable(0).getNumberOfClauses(), 1);
-    /*ASSERT_EQ(rel.getVariable(1).getNumberOfClauses(), 2);
+    ASSERT_EQ(rel.getVariable(0).getNumberOfClauses(), 1);
+    ASSERT_EQ(rel.getVariable(1).getNumberOfClauses(), 2);
     ASSERT_EQ(rel.getVariable(2).getNumberOfClauses(), 2);
     ASSERT_EQ(rel.getVariable(3).getNumberOfClauses(), 1);
-    ASSERT_EQ(rel.getVariable(4).getNumberOfClauses(), 1);*/
+    ASSERT_EQ(rel.getVariable(4).getNumberOfClauses(), 1);
+
+    Clause& c1 = rel.getClause(0);
+    int count = 0;
+    for (auto it = c1.begin(); it != c1.end(); ++it) {
+        count++;
+    }
+    ASSERT_EQ(count, 3);
+
+    c1 = rel.getClause(1);
+    count = 0;
+    for (auto it = c1.begin(); it != c1.end(); ++it) {
+        count++;
+    }
+    ASSERT_EQ(count, 4);
+}
+
+TEST(Test1Suite, DimacsReaderPositive2) {
+    CNFFormula rel;
+    DimacsReader reader(rel);
+    reader.readFile("../../Google_tests/dimacsFiles/DimacsTest2.dimacs");
+    ASSERT_EQ(rel.getVariable(0).getNumberOfClauses(), 1);
+    ASSERT_EQ(rel.getVariable(1).getNumberOfClauses(), 2);
+    ASSERT_EQ(rel.getVariable(2).getNumberOfClauses(), 2);
+    ASSERT_EQ(rel.getVariable(3).getNumberOfClauses(), 2);
+    ASSERT_EQ(rel.getVariable(4).getNumberOfClauses(), 2);
+
+    Clause& c1 = rel.getClause(0);
+    int count = 0;
+    for (auto it = c1.begin(); it != c1.end(); ++it) {
+        count++;
+    }
+    ASSERT_EQ(count, 3);
+
+    c1 = rel.getClause(1);
+    count = 0;
+    for (auto it = c1.begin(); it != c1.end(); ++it) {
+        count++;
+    }
+    ASSERT_EQ(count, 4);
+
+    c1 = rel.getClause(2);
+    count = 0;
+    for (auto it = c1.begin(); it != c1.end(); ++it) {
+        count++;
+    }
+    ASSERT_EQ(count, 2);
 }
 
 TEST(Test1Suite, DimacsReaderDimacsFormatException_Test) {
@@ -45,6 +89,27 @@ TEST(Test1Suite, DimacsReaderDimacsFormatException_Test) {
         s += ".dimacs";
         ASSERT_THROW(reader.readFile(s), DimacsFormatException);
     }
+}
+
+TEST(Test1Suite, CNFFormulaCopyConstructor) {
+    CNFFormula f;
+    CNFFormula f1 = f;
+    auto c = f.addNewClause();
+    auto v = f.addNewVariable();
+    f.addVariableToClause(v, c, true);
+    ASSERT_TRUE(f1.isEmptySet());
+
+    CNFFormula f2 = f;
+    Variable& var = f.getVariable(v);
+    var.removeClause(c);
+
+    ASSERT_EQ(f.getVariable(v).getNumberOfClauses(), 0);
+    ASSERT_EQ(f2.getVariable(v).getNumberOfClauses(), 1);
+
+    CNFFormula f3 = f2;
+    f2.getClause(c).removeVariable(v);
+    ASSERT_TRUE(f2.getClause(c).isEmpty());
+    ASSERT_TRUE(!f3.getClause(c).isEmpty());
 }
 
 /*TEST(Test1Suite, CorrectFormulaRepresentation1) {
