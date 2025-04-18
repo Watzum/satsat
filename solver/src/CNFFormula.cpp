@@ -27,6 +27,9 @@ void CNFFormula::addVariableToClause(size_t varId, size_t clauseId, bool polarit
     v.addClause(clauseId, polarity);
     Clause& c = clauses.at(clauseId);
     c.addVariable(varId, polarity);
+    if (c.isUnitClause()) {
+        unitClauses.emplace(clauseId);
+    }
 }
 
 
@@ -95,6 +98,11 @@ void CNFFormula::assignVariable(size_t varId, bool polarity) {
         c.addVariableAssignment(varId, polarity);
         auto newState = c.getState();
         changeAssignmentState(clauseId, prevState, newState);
+        if (unitClauses.contains(clauseId) && !c.isUnitClause()) {
+            unitClauses.erase(clauseId);
+        } else if (c.isUnitClause()) {
+            unitClauses.emplace(clauseId);
+        }
     }
 }
 
@@ -108,11 +116,25 @@ void CNFFormula::revokeVariableAssignment(size_t varId) {
         c.removeVariableAssignment(varId, prevAssignment);
         auto newState = c.getState();
         changeAssignmentState(clauseId, prevState, newState);
+        if (unitClauses.contains(clauseId) && !c.isUnitClause()) {
+            unitClauses.erase(clauseId);
+        } else if (c.isUnitClause()) {
+            unitClauses.emplace(clauseId);
+        }
+    }
+}
+
+void CNFFormula::assignUnitClauses() {
+    while (!unitClauses.empty()) {
+        size_t unitClauseId = *unitClauses.begin();
+        Clause& c = clauses.at(unitClauseId);
+        auto v = c.getUnitClauseVar();
+        assignVariable(v.first, v.second);
     }
 }
 
 void CNFFormula::changeAssignmentState(size_t clauseId, dimacs::varAssignment prevState,
-    dimacs::varAssignment newState) {
+                                       dimacs::varAssignment newState) {
     if (prevState != newState) {
         if (newState == dimacs::TRUE) {
             satisfiedClauses.emplace(clauseId);

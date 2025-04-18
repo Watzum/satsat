@@ -19,6 +19,7 @@ public:
     void addClause(size_t clauseId, bool polarity);
     void removeClause(size_t clauseId);
     std::unordered_map<size_t, bool>::iterator removeClause(std::unordered_map<size_t, bool>::iterator clauseId);
+    bool getPolarityInClause(size_t clauseId) const;
     void assignValue(bool value);
     void unassignValue();
 

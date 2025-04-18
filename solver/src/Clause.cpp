@@ -5,6 +5,7 @@
 #include "../include/Clause.h"
 
 #include <cassert>
+#include <iostream>
 
 void Clause::addVariable(size_t varId, bool polarity) {
     variables.emplace(varId, polarity);
@@ -41,12 +42,27 @@ void Clause::removeVariableAssignment(size_t varId, bool value) {
     unassignedVariables.emplace(varId);
 }
 
+std::pair<size_t, bool> Clause::getUnitClauseVar() {
+    assert(isUnitClause());
+    size_t v = *unassignedVariables.begin();
+    return std::make_pair(v, variables.at(v));
+}
+
 bool Clause::isEmpty() const {
     return satisfyingVariables.empty() && unassignedVariables.empty();
 }
 
 bool Clause::isSatisfied() const {
     return !satisfyingVariables.empty();
+}
+
+bool Clause::isUnitClause() const {
+    return satisfyingVariables.empty() && unassignedVariables.size() == 1;
+}
+
+bool Clause::getPolarity(size_t varId) const {
+    assert(variables.contains(varId));
+    return variables.at(varId);
 }
 
 dimacs::varAssignment Clause::getState() {

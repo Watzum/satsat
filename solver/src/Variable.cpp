@@ -5,6 +5,8 @@
 #include <string>
 #include "include/Variable.h"
 
+#include <cassert>
+
 void Variable::addClause(size_t clauseId, bool polarity) {
     clauses.emplace(clauseId, polarity);
     if (polarity) {
@@ -33,6 +35,11 @@ std::unordered_map<size_t, bool>::iterator Variable::removeClause(std::unordered
         negative_occurrences--;
     }
     return clauses.erase(it);
+}
+
+bool Variable::getPolarityInClause(size_t clauseId) const {
+    assert(clauses.contains(clauseId));
+    return clauses.at(clauseId);
 }
 
 void Variable::assignValue(bool value) {

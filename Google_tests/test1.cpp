@@ -191,6 +191,42 @@ TEST(Test1Suite, CNFAssignmentTest1) {
     ASSERT_TRUE(f.getAssignmentState() == dimacs::FALSE);
 }
 
+TEST(Test1Suite, UnitClauseAssignmentTest1) {
+    CNFFormula f;
+    auto c1 = f.addNewClause();
+    auto c2 = f.addNewClause();
+    auto v1 = f.addNewVariable();
+    auto v2 = f.addNewVariable();
+    f.addVariableToClause(c1, v1, true);
+    f.addVariableToClause(c2, v2, false);
+    f.assignUnitClauses();
+    ASSERT_TRUE(f.getAssignmentState() == dimacs::TRUE);
+
+    CNFFormula f2;
+    c1 = f2.addNewClause();
+    c2 = f2.addNewClause();
+    v1 = f2.addNewVariable();
+    v2 = f2.addNewVariable();
+    f2.addVariableToClause(v1, c1, true);
+    f2.addVariableToClause(v2, c1, false);
+    f2.addVariableToClause(v1, c2, false);
+    f2.addVariableToClause(v2, c2, false);
+    f2.assignVariable(v1, true);
+    f2.assignUnitClauses();
+    ASSERT_TRUE(f2.getAssignmentState() == dimacs::TRUE);
+
+    CNFFormula f3;
+    c1 = f3.addNewClause();
+    c2 = f3.addNewClause();
+    v1 = f3.addNewVariable();
+    v2 = f3.addNewVariable();
+    f3.addVariableToClause(v1, c1, true);
+    f3.addVariableToClause(v2, c2, false);
+    f3.addVariableToClause(v1, c2, false);
+    f3.assignUnitClauses();
+    ASSERT_TRUE(f3.getAssignmentState() == dimacs::TRUE);
+}
+
 /*TEST(Test1Suite, CorrectFormulaRepresentation1) {
     DimacsReader reader;
     CNFFormula c{reader.readFile("../../Google_tests/dimacsFiles/DimacsTest2.dimacs")};

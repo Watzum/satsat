@@ -42,6 +42,7 @@ public:
     //returns false if assignment results in an empty clause <=> unsat assignment
     void assignVariable(size_t varId, bool polarity);
     void revokeVariableAssignment(size_t varId);
+    void assignUnitClauses();
 
 
 private:
@@ -53,6 +54,8 @@ private:
     std::set<size_t> emptyClauses;
     std::set<size_t> satisfiedClauses;
     std::set<size_t> unknownClauses;
+    std::set<size_t> unitClauses;
+
 
 };
 

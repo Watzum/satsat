@@ -17,8 +17,11 @@ public:
     bool removeVariable(size_t varId);
     void addVariableAssignment(size_t varId, bool value);
     void removeVariableAssignment(size_t varId, bool value); //possible improvement: value does not have to be passed
+    std::pair<size_t, bool> getUnitClauseVar();
     bool isEmpty() const;
     bool isSatisfied() const;
+    bool isUnitClause() const;
+    bool getPolarity(size_t varId) const;
     dimacs::varAssignment getState();
     std::unordered_map<size_t,bool>::const_iterator begin();
     std::unordered_map<size_t,bool>::const_iterator end();
