@@ -77,12 +77,12 @@ size_t CNFFormula::getVariableCount() const {
 }
 
 dimacs::varAssignment CNFFormula::getAssignmentState() const {
-    if (!satisfiedClauses.empty()) {
-        return dimacs::TRUE;
+    if (!emptyClauses.empty()) {
+        return dimacs::FALSE;
     } if (!unknownClauses.empty()) {
         return dimacs::UNKNOWN;
     }
-    return dimacs::FALSE;
+    return dimacs::TRUE;
 }
 
 void CNFFormula::assignVariable(size_t varId, bool polarity) {

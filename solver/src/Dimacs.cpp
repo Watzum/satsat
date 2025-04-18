@@ -40,33 +40,42 @@ bool branch(CNFFormula& currentFormula, std::vector<dimacs::varAssignment>& assi
     return false;
 }
 
+bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) {
+    currentFormula.assignVariable(currentVarId, varCount);
+    auto state = currentFormula.getAssignmentState();
+    std::cout << "Branch " << currentVarId << " -> TRUE " << std::endl;
+    if (state == dimacs::TRUE) {
+        return true;
+    }
+    if (currentVarId + 1 < varCount) {
+        if (branch_2(currentFormula, currentVarId + 1, varCount)) {
+            return true;
+        }
+    }
+    currentFormula.revokeVariableAssignment(currentVarId);
+    currentFormula.assignVariable(currentVarId, false);
+    state = currentFormula.getAssignmentState();
+    std::cout << "Branch " << currentVarId << " -> NEGATIVE " << std::endl;
+    if (state == dimacs::TRUE) {
+        return true;
+    }  if (state == dimacs::FALSE) {
+        currentFormula.revokeVariableAssignment(currentVarId);
+        return false;
+    }
+    if (currentVarId + 1 < varCount) {
+        if (branch_2(currentFormula, currentVarId + 1, varCount)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void dimacs::solve(const std::string& filePath) {
     CNFFormula formula;
     DimacsReader reader(formula);
     reader.readFile(filePath);
     std::vector<varAssignment> currentAssignment(formula.getVariableCount(), UNKNOWN);
-    std::cout << branch(formula, currentAssignment, 0, formula.getVariableCount()) << std::endl;
-}
-
-bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) {
-    /*if (currentFormula.assignVariable(currentVarId, true)) {
-        if (currentVarId + 1 < varCount) {
-            if (branch_2(currentFormula, currentVarId, varCount)) {
-                return true;
-            }
-        }
-    } else {
-        currentFormula.revokeVariableAssignment(currentVarId);
-        if (currentFormula.assignVariable(currentVarId, false)) {
-            if (currentVarId + 1 < varCount) {
-                if (branch_2(currentFormula, currentVarId + 1, varCount)) {
-                    return true;
-                }
-            }
-        }
-    }*/
-    //currentFormula.revokeVariableAssignment(currentVarId);
-    return false;
+    std::cout << branch_2(formula, 0, formula.getVariableCount()) << std::endl;
 }
 
 //only works with non-negative integers
