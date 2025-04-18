@@ -5,9 +5,7 @@
 #ifndef CNFFORMULA_H
 #define CNFFORMULA_H
 #include <algorithm>
-#include <map>
 #include <iostream>
-#include <utility>
 #include <vector>
 
 #include "Clause.h"
@@ -36,18 +34,26 @@ public:
     //TODO: void removeVarFromClause(long varId, long clauseId);
     size_t addNewClause();
     void removeClause(size_t clauseId);
-    bool isEmptySet();
+    [[nodiscard]] bool isEmptySet() const;
 
-    size_t getVariableCount();
+    [[nodiscard]] size_t getVariableCount() const;
+    [[nodiscard]] dimacs::varAssignment getAssignmentState() const;
 
-    //returns false if assignment results in empty clause <=> unsat assignment
-    bool assignVariable(size_t varId, bool polarity);
+    //returns false if assignment results in an empty clause <=> unsat assignment
+    void assignVariable(size_t varId, bool polarity);
+    void revokeVariableAssignment(size_t varId);
 
 
 private:
+
+    void changeAssignmentState(size_t clauseId, dimacs::varAssignment prevState, dimacs::varAssignment newState);
+
     std::vector<Clause> clauses;
     std::vector<Variable> variables;
-    //std::vector<Variable*> splitQueue;
+    std::set<size_t> emptyClauses;
+    std::set<size_t> satisfiedClauses;
+    std::set<size_t> unknownClauses;
+
 };
 
 

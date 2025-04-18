@@ -7,6 +7,7 @@
 #include <string>
 
 #include "include/DimacsReader.h"
+#include "include/Dimacs.h"
 
 using namespace std;
 

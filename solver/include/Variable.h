@@ -8,14 +8,19 @@
 #include <string>
 #include <unordered_map>
 
+#include "Variable.h"
+#include "Dimacs.h"
+
 class Variable {
 public:
 
-    Variable() : negative_occurrences(0), positive_occurrences(0) {}
+    Variable() : assignment(dimacs::varAssignment::TRUE), negative_occurrences(0), positive_occurrences(0) {}
 
     void addClause(size_t clauseId, bool polarity);
     void removeClause(size_t clauseId);
     std::unordered_map<size_t, bool>::iterator removeClause(std::unordered_map<size_t, bool>::iterator clauseId);
+    void assignValue(bool value);
+    void unassignValue();
 
     std::unordered_map<size_t,bool>::iterator begin();
     std::unordered_map<size_t,bool>::iterator end();
@@ -25,11 +30,14 @@ public:
     [[nodiscard]] std::string to_string() const;
     [[nodiscard]] bool isPure() const;
     [[nodiscard]] bool getPolarity() const;
+    dimacs::varAssignment getAssignedValue() const;
 
 private:
     std::unordered_map<size_t, bool> clauses;
+    dimacs::varAssignment assignment;
     long negative_occurrences;
     long positive_occurrences;
+
 };
 
 #endif //VARIABLE_H

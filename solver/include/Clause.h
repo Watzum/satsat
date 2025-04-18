@@ -7,21 +7,27 @@
 #include <set>
 #include <unordered_map>
 
+#include "Dimacs.h"
+
 
 class Clause {
 public:
-    Clause() : satisfied(false) {}
+    Clause() = default;
     void addVariable(size_t varId, bool polarity);
     bool removeVariable(size_t varId);
+    void addVariableAssignment(size_t varId, bool value);
+    void removeVariableAssignment(size_t varId, bool value); //possible improvement: value does not have to be passed
     bool isEmpty() const;
     bool isSatisfied() const;
-    void setSatisfied();
+    dimacs::varAssignment getState();
     std::unordered_map<size_t,bool>::const_iterator begin();
     std::unordered_map<size_t,bool>::const_iterator end();
 
 private:
     std::unordered_map<size_t, bool> variables;
-    bool satisfied;
+    std::set<size_t> satisfyingVariables;
+    std::set<size_t> unsatisfyingVariables;
+    std::set<size_t> unassignedVariables;
 };
 
 

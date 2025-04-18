@@ -35,6 +35,18 @@ std::unordered_map<size_t, bool>::iterator Variable::removeClause(std::unordered
     return clauses.erase(it);
 }
 
+void Variable::assignValue(bool value) {
+    if (value) {
+        assignment = dimacs::varAssignment::TRUE;
+    } else {
+        assignment = dimacs::varAssignment::FALSE;
+    }
+}
+
+void Variable::unassignValue() {
+    assignment = dimacs::varAssignment::UNKNOWN;
+}
+
 
 size_t Variable::getNumberOfClauses() const {
     return clauses.size();
@@ -65,6 +77,10 @@ bool Variable::getPolarity() const {
         return true;
     }
     return false;
+}
+
+dimacs::varAssignment Variable::getAssignedValue() const {
+    return assignment;
 }
 
 

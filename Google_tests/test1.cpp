@@ -122,8 +122,11 @@ TEST(Test1Suite, CNFFormulaAssignment) {
     f.addVariableToClause(v1, c1, true);
     f.addVariableToClause(v2, c1, false);
 
-    ASSERT_TRUE(f.assignVariable(v1, false));
-    ASSERT_TRUE(!f.assignVariable(v2, true));
+    f.assignVariable(v1, false);
+    std::cout << f.getAssignmentState() << std::endl;
+    ASSERT_TRUE(f.getAssignmentState() == dimacs::UNKNOWN);
+    f.assignVariable(v2, true);
+    ASSERT_TRUE(f.getAssignmentState() == dimacs::FALSE);
 
     CNFFormula f2;
 
@@ -133,10 +136,59 @@ TEST(Test1Suite, CNFFormulaAssignment) {
     f2.addVariableToClause(v1, c1, true);
 
     CNFFormula f3 = f2;
-    ASSERT_TRUE(f2.assignVariable(v1, true));
-    ASSERT_FALSE(f3.assignVariable(v1, false));
+    f2.assignVariable(v1, true);
+    f3.assignVariable(v1, false);
     ASSERT_TRUE(f2.isEmptySet());
     ASSERT_FALSE(f3.isEmptySet());
+}
+
+
+TEST(Test1Suite, ClauseAssignmentTest1) {
+    Clause c;
+    ASSERT_TRUE(c.isEmpty());
+    ASSERT_FALSE(c.isSatisfied());
+    c.addVariable(0, true);
+    ASSERT_FALSE(c.isEmpty());
+    ASSERT_FALSE(c.isSatisfied());
+    c.addVariableAssignment(0, true);
+    ASSERT_TRUE(c.isSatisfied());
+    ASSERT_FALSE(c.isEmpty());
+    c.removeVariableAssignment(0, true);
+    ASSERT_FALSE(c.isEmpty());
+    ASSERT_FALSE(c.isSatisfied());
+    c.addVariableAssignment(0, false);
+    ASSERT_FALSE(c.isSatisfied());
+    ASSERT_TRUE(c.isEmpty());
+}
+
+TEST(Test1Suite, ClauseAssignmentTest2) {
+    Clause c;
+    c.addVariable(0, true);
+    c.addVariable(1, false);
+    c.addVariable(2, true);
+    c.addVariableAssignment(0, false);
+    c.addVariableAssignment(1, true);
+    ASSERT_FALSE(c.isEmpty());
+    ASSERT_FALSE(c.isSatisfied());
+    c.addVariableAssignment(2, true);
+    ASSERT_FALSE(c.isEmpty());
+    ASSERT_TRUE(c.isSatisfied());
+    c.removeVariableAssignment(2, true);
+    ASSERT_TRUE(!c.isSatisfied() && !c.isEmpty());
+    c.addVariableAssignment(2, false);
+    ASSERT_TRUE(c.isEmpty() && !c.isSatisfied());
+}
+
+TEST(Test1Suite, CNFAssignmentTest1) {
+    CNFFormula f;
+    auto c1 = f.addNewClause();
+    auto v1 = f.addNewVariable();
+    f.addVariableToClause(v1, c1, true);
+    f.assignVariable(v1, true);
+    ASSERT_TRUE(f.getAssignmentState() == dimacs::TRUE);
+    f.revokeVariableAssignment(v1);
+    f.assignVariable(v1, false);
+    ASSERT_TRUE(f.getAssignmentState() == dimacs::FALSE);
 }
 
 /*TEST(Test1Suite, CorrectFormulaRepresentation1) {

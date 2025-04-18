@@ -4,38 +4,9 @@
 
 #include "../include/CNFFormula.h"
 
+#include <cassert>
 #include <iostream>
 #include <stdexcept>
-
-/*
-Variable* CNFFormula::peekVariable() {
-    if (splitQueue.empty()) {
-        return nullptr;
-    }
-    return splitQueue.at(0);
-}
-
-void CNFFormula::splitOnNextVariable(bool pol) {
-
-    Variable* v = splitQueue.at(0);
-    if (v != nullptr) {
-        for (auto clause : *v) {
-            if (clause.second == pol) {
-                clausesToVariableMap.erase(clausesToVariableMap.begin() + clause.first);
-            } else {
-                v->removeClause(clause.first);
-            }
-        }
-        std::pop_heap(splitQueue.begin(), splitQueue.end(), dimacs::purity_comparison());
-        splitQueue.pop_back();
-    }
-}*/
-
-/*
-CNFFormula::CNFFormula(const CNFFormula& c) {
-    clauses = c.clauses;
-    variables = c.variables;
-}*/
 
 Variable& CNFFormula::getVariable(long varId) {
     if (variables.size() > varId) {
@@ -77,42 +48,85 @@ Clause& CNFFormula::getClause(long clauseId) {
 
 size_t CNFFormula::addNewClause() {
     clauses.emplace_back();
+    unknownClauses.emplace(clauses.size() - 1);
     return clauses.size() - 1;
 }
 
 
 void CNFFormula::removeClause(size_t clauseId) {
+    //Removing clauses, changes the clauseIds
+    assert(false);
+    assert(clauses.size() > clauseId);
     Clause c = clauses.at(clauseId);
     for (auto it : c) {
         Variable& v = variables.at(it.first);
         v.removeClause(clauseId);
     }
-    clauses.at(clauseId).setSatisfied();
+    emptyClauses.erase(clauseId);
 }
 
 
-bool CNFFormula::isEmptySet() {
-    return clauses.empty();
+bool CNFFormula::isEmptySet() const {
+    return emptyClauses.empty();
 }
 
-size_t CNFFormula::getVariableCount() {
+
+
+size_t CNFFormula::getVariableCount() const {
     return variables.size();
 }
 
-bool CNFFormula::assignVariable(size_t varId, bool polarity) {
-    std::cout << "Branching Variable " << varId << " " << polarity << '\n';
+dimacs::varAssignment CNFFormula::getAssignmentState() const {
+    if (!satisfiedClauses.empty()) {
+        return dimacs::TRUE;
+    } if (!unknownClauses.empty()) {
+        return dimacs::UNKNOWN;
+    }
+    return dimacs::FALSE;
+}
+
+void CNFFormula::assignVariable(size_t varId, bool polarity) {
     Variable& v = variables.at(varId);
-    bool returnValue = true;
-    for (auto it = v.begin(); it != v.end();) {
-        size_t clauseId = it->first;
-        bool clausePolarity = it->second;
-        it = v.removeClause(it);
-        clauses.at(clauseId).removeVariable(varId);
-        if (clausePolarity == polarity) {
-            removeClause(clauseId);
-        } else if (clauses.at(clauseId).isEmpty()) {
-            returnValue = false;
+    v.assignValue(polarity);
+    for (auto & it : v) {
+        auto clauseId = it.first;
+        Clause& c = clauses.at(clauseId);
+        auto prevState = c.getState();
+        c.addVariableAssignment(varId, polarity);
+        auto newState = c.getState();
+        changeAssignmentState(clauseId, prevState, newState);
+    }
+}
+
+void CNFFormula::revokeVariableAssignment(size_t varId) {
+    Variable& v = variables.at(varId);
+    bool prevAssignment = v.getAssignedValue() == dimacs::TRUE ? true : false;
+    for (auto& it : v) {
+        auto clauseId = it.first;
+        Clause& c = clauses.at(clauseId);
+        auto prevState = c.getState();
+        c.removeVariableAssignment(varId, prevAssignment);
+        auto newState = c.getState();
+        changeAssignmentState(clauseId, prevState, newState);
+    }
+}
+
+void CNFFormula::changeAssignmentState(size_t clauseId, dimacs::varAssignment prevState,
+    dimacs::varAssignment newState) {
+    if (prevState != newState) {
+        if (newState == dimacs::TRUE) {
+            satisfiedClauses.emplace(clauseId);
+        } else if (newState == dimacs::FALSE) {
+            emptyClauses.emplace(clauseId);
+        } else {
+            unknownClauses.emplace(clauseId);
+        }
+        if (prevState == dimacs::TRUE) {
+            satisfiedClauses.erase(clauseId);
+        } else if (prevState == dimacs::FALSE) {
+            emptyClauses.erase(clauseId);
+        } else {
+            unknownClauses.erase(clauseId);
         }
     }
-    return returnValue;
 }
