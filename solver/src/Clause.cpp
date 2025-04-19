@@ -65,6 +65,10 @@ bool Clause::getPolarity(size_t varId) const {
     return variables.at(varId);
 }
 
+size_t Clause::getNumberOfVariables() const {
+    return variables.size();
+}
+
 dimacs::varAssignment Clause::getState() {
     if (!satisfyingVariables.empty()) {
         return dimacs::TRUE;

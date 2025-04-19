@@ -18,17 +18,23 @@ Variable& CNFFormula::getVariable(long varId) {
 
 size_t CNFFormula::addNewVariable() {
     variables.emplace_back();
+    unassignedVariables.emplace(variables.size() - 1);
     return variables.size() - 1;
 }
 
 
 void CNFFormula::addVariableToClause(size_t varId, size_t clauseId, bool polarity) {
+
     Variable& v = variables.at(varId);
     v.addClause(clauseId, polarity);
     Clause& c = clauses.at(clauseId);
     c.addVariable(varId, polarity);
-    if (c.isUnitClause()) {
+    if (c.getNumberOfVariables() == 1) {
         unitClauses.emplace(clauseId);
+        emptyClauses.erase(clauseId);
+        unknownClauses.emplace(clauseId);
+    } else if (c.getNumberOfVariables() == 2) {
+        unitClauses.erase(clauseId);
     }
 }
 
@@ -51,7 +57,7 @@ Clause& CNFFormula::getClause(long clauseId) {
 
 size_t CNFFormula::addNewClause() {
     clauses.emplace_back();
-    unknownClauses.emplace(clauses.size() - 1);
+    emptyClauses.emplace(clauses.size() - 1);
     return clauses.size() - 1;
 }
 
@@ -89,8 +95,10 @@ dimacs::varAssignment CNFFormula::getAssignmentState() const {
 }
 
 void CNFFormula::assignVariable(size_t varId, bool polarity) {
+    assert(unassignedVariables.contains(varId));
     Variable& v = variables.at(varId);
     v.assignValue(polarity);
+    unassignedVariables.erase(varId);
     for (auto & it : v) {
         auto clauseId = it.first;
         Clause& c = clauses.at(clauseId);
@@ -107,6 +115,7 @@ void CNFFormula::assignVariable(size_t varId, bool polarity) {
 }
 
 void CNFFormula::revokeVariableAssignment(size_t varId) {
+    assert(!unassignedVariables.contains(varId));
     Variable& v = variables.at(varId);
     bool prevAssignment = v.getAssignedValue() == dimacs::TRUE ? true : false;
     for (auto& it : v) {
@@ -122,6 +131,8 @@ void CNFFormula::revokeVariableAssignment(size_t varId) {
             unitClauses.emplace(clauseId);
         }
     }
+    v.unassignValue();
+    unassignedVariables.emplace(varId);
 }
 
 void CNFFormula::assignUnitClauses() {
@@ -130,6 +141,37 @@ void CNFFormula::assignUnitClauses() {
         Clause& c = clauses.at(unitClauseId);
         auto v = c.getUnitClauseVar();
         assignVariable(v.first, v.second);
+    }
+}
+
+void CNFFormula::resetAssignment() {
+    for (size_t v = 0; v != variables.size(); ++v) {
+        if (!unassignedVariables.contains(v)) {
+            revokeVariableAssignment(v);
+        }
+    }
+}
+
+size_t CNFFormula::selectUnassignedVariable() const {
+    assert(!unassignedVariables.empty());
+    return *unassignedVariables.begin();
+}
+
+bool CNFFormula::everyVariableAssigned() const {
+    return unassignedVariables.empty();
+}
+
+void CNFFormula::printCurrentAssignment() const {
+    for (size_t i = 0; i != variables.size(); ++i) {
+        std::cout << "Var " << i << " -> ";
+        if (variables.at(i).getAssignedValue() == dimacs::UNKNOWN) {
+            std::cout << "UNASSIGNED";
+        } else if (variables.at(i).getAssignedValue() == dimacs::TRUE) {
+            std::cout << "TRUE";
+        } else {
+            std::cout << "FALSE";
+        }
+        std::cout << '\n';
     }
 }
 

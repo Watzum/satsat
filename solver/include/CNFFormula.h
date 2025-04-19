@@ -39,10 +39,19 @@ public:
     [[nodiscard]] size_t getVariableCount() const;
     [[nodiscard]] dimacs::varAssignment getAssignmentState() const;
 
+
+
     //returns false if assignment results in an empty clause <=> unsat assignment
     void assignVariable(size_t varId, bool polarity);
     void revokeVariableAssignment(size_t varId);
     void assignUnitClauses();
+    void resetAssignment();
+
+    size_t selectUnassignedVariable() const;
+    bool everyVariableAssigned() const;
+
+    void printCurrentAssignment() const;
+
 
 
 private:
@@ -51,6 +60,7 @@ private:
 
     std::vector<Clause> clauses;
     std::vector<Variable> variables;
+    std::set<size_t> unassignedVariables;
     std::set<size_t> emptyClauses;
     std::set<size_t> satisfiedClauses;
     std::set<size_t> unknownClauses;

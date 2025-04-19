@@ -227,6 +227,18 @@ TEST(Test1Suite, UnitClauseAssignmentTest1) {
     ASSERT_TRUE(f3.getAssignmentState() == dimacs::TRUE);
 }
 
+TEST(Test1Suite, resetAssignmentTest) {
+    CNFFormula f;
+    auto v1 = f.addNewVariable();
+    auto c1 = f.addNewClause();
+    f.addVariableToClause(v1, c1, true);
+    f.resetAssignment();
+    ASSERT_TRUE(f.getAssignmentState() == dimacs::UNKNOWN);
+    f.assignVariable(v1, true);
+    f.resetAssignment();
+    ASSERT_TRUE(f.getAssignmentState() == dimacs::UNKNOWN);
+}
+
 /*TEST(Test1Suite, CorrectFormulaRepresentation1) {
     DimacsReader reader;
     CNFFormula c{reader.readFile("../../Google_tests/dimacsFiles/DimacsTest2.dimacs")};

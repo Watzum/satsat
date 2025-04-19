@@ -8,6 +8,8 @@
 
 #include "include/Dimacs.h"
 
+#include <cassert>
+
 #include "include/DimacsFormatException.h"
 #include "include/DimacsReader.h"
 
@@ -38,6 +40,34 @@ bool branch(CNFFormula& currentFormula, std::vector<dimacs::varAssignment>& assi
 
     }*/
     return false;
+}
+
+bool branch_3(CNFFormula& formula, std::vector<size_t>& branchedVariables) {
+    assert(formula.getVariableCount() > 0);
+    formula.assignUnitClauses();
+    if (formula.getAssignmentState() == dimacs::TRUE) {
+        formula.printCurrentAssignment();
+        return true;
+    }
+    if (formula.getAssignmentState() == dimacs::FALSE) {
+        return false;
+    }
+    if (formula.getAssignmentState() != dimacs::FALSE && formula.everyVariableAssigned() == false) {
+        size_t varId = formula.selectUnassignedVariable();
+        std::cout << "Branch " << varId << " -> TRUE " << std::endl;
+        formula.assignVariable(varId, true);
+        branchedVariables.push_back(varId);
+        if (branch_3(formula, branchedVariables)) {
+            return true;
+        }
+    }
+    formula.resetAssignment();
+    size_t c = formula.addNewClause();
+    for (size_t i : branchedVariables) {
+        formula.addVariableToClause(i, c, false);
+    }
+    branchedVariables.clear();
+    return branch_3(formula, branchedVariables);
 }
 
 bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) {
@@ -75,7 +105,9 @@ void dimacs::solve(const std::string& filePath) {
     DimacsReader reader(formula);
     reader.readFile(filePath);
     std::vector<varAssignment> currentAssignment(formula.getVariableCount(), UNKNOWN);
-    std::cout << branch_2(formula, 0, formula.getVariableCount()) << std::endl;
+    //std::cout << branch_2(formula, 0, formula.getVariableCount()) << std::endl;
+    std::vector<size_t> v;
+    std::cout << branch_3(formula, v) << std::endl;
 }
 
 //only works with non-negative integers
