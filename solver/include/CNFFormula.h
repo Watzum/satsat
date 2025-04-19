@@ -19,12 +19,9 @@ public:
     CNFFormula() = default;
     CNFFormula(const CNFFormula& c) = default;
 
-    //Variable* peekVariable();
-    //void splitOnNextVariable(bool polarity);
-
-
     //pre: varId >= 0
     Variable& getVariable(long varId);
+    [[nodiscard]] dimacs::varAssignment getVariableAssignment(size_t varId) const;
     size_t addNewVariable();
     void addVariableToClause(size_t varId, size_t clauseId, bool polarity);
     void removeVariableFromClause(size_t varId, size_t clauseId);
@@ -39,8 +36,6 @@ public:
     [[nodiscard]] size_t getVariableCount() const;
     [[nodiscard]] dimacs::varAssignment getAssignmentState() const;
 
-
-
     //returns false if assignment results in an empty clause <=> unsat assignment
     void assignVariable(size_t varId, bool polarity);
     void revokeVariableAssignment(size_t varId);
@@ -52,10 +47,7 @@ public:
 
     void printCurrentAssignment() const;
 
-
-
 private:
-
     void changeAssignmentState(size_t clauseId, dimacs::varAssignment prevState, dimacs::varAssignment newState);
 
     std::vector<Clause> clauses;
@@ -65,8 +57,6 @@ private:
     std::set<size_t> satisfiedClauses;
     std::set<size_t> unknownClauses;
     std::set<size_t> unitClauses;
-
-
 };
 
 

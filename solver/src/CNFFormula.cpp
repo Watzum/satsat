@@ -15,6 +15,11 @@ Variable& CNFFormula::getVariable(long varId) {
     throw std::runtime_error("Variable " + std::to_string(varId) + " does not exist");
 }
 
+dimacs::varAssignment CNFFormula::getVariableAssignment(size_t varId) const {
+    assert(varId < variables.size());
+    return variables.at(varId).getAssignedValue();
+}
+
 
 size_t CNFFormula::addNewVariable() {
     variables.emplace_back();

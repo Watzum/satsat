@@ -42,11 +42,18 @@ bool branch(CNFFormula& currentFormula, std::vector<dimacs::varAssignment>& assi
     return false;
 }
 
-bool branch_3(CNFFormula& formula, std::vector<size_t>& branchedVariables) {
+bool branch_3(CNFFormula& formula, const std::vector<size_t>& mapping, std::vector<size_t>& branchedVariables) {
     assert(formula.getVariableCount() > 0);
     formula.assignUnitClauses();
     if (formula.getAssignmentState() == dimacs::TRUE) {
-        formula.printCurrentAssignment();
+        std::cout << "SAT: ";
+        for (size_t i = 0; i != formula.getVariableCount(); ++i) {
+            if (formula.getVariableAssignment(i) == dimacs::FALSE) {
+                std::cout << "-" << mapping.at(i) << " ";
+            } else if (formula.getVariableAssignment(i) == dimacs::TRUE) {
+                std::cout << mapping.at(i) << " ";
+            }
+        }
         return true;
     }
     if (formula.getAssignmentState() == dimacs::FALSE) {
@@ -57,7 +64,7 @@ bool branch_3(CNFFormula& formula, std::vector<size_t>& branchedVariables) {
         std::cout << "Branch " << varId << " -> TRUE " << std::endl;
         formula.assignVariable(varId, true);
         branchedVariables.push_back(varId);
-        if (branch_3(formula, branchedVariables)) {
+        if (branch_3(formula, mapping, branchedVariables)) {
             return true;
         }
     }
@@ -67,7 +74,7 @@ bool branch_3(CNFFormula& formula, std::vector<size_t>& branchedVariables) {
         formula.addVariableToClause(i, c, false);
     }
     branchedVariables.clear();
-    return branch_3(formula, branchedVariables);
+    return branch_3(formula, mapping, branchedVariables);
 }
 
 bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) {
@@ -102,12 +109,11 @@ bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) 
 
 void dimacs::solve(const std::string& filePath) {
     CNFFormula formula;
-    DimacsReader reader(formula);
+    std::vector<size_t> mapping;
+    DimacsReader reader(formula, mapping);
     reader.readFile(filePath);
-    std::vector<varAssignment> currentAssignment(formula.getVariableCount(), UNKNOWN);
-    //std::cout << branch_2(formula, 0, formula.getVariableCount()) << std::endl;
     std::vector<size_t> v;
-    std::cout << branch_3(formula, v) << std::endl;
+    std::cout << branch_3(formula, mapping, v) << std::endl;
 }
 
 //only works with non-negative integers

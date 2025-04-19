@@ -12,7 +12,8 @@
 #include "include/Dimacs.h"
 #include "include/DimacsFormatException.h"
 
-DimacsReader::DimacsReader(CNFFormula& formula): relation(formula) {}
+DimacsReader::DimacsReader(CNFFormula& formula, std::vector<size_t>& m): relation(formula), mapping(m) {
+}
 
 
 void DimacsReader::readFile(const std::string& filePath) {
@@ -83,6 +84,7 @@ void DimacsReader::readClauses() {
                 relation.addVariableToClause(search->second, currentClause, polarity);
             } else {
                 size_t internalVarId = relation.addNewVariable();
+                mapping.push_back(varFileNumber);
                 relation.addVariableToClause(internalVarId, currentClause, polarity);
                 fileToInternal.emplace(varFileNumber, internalVarId);
             }
