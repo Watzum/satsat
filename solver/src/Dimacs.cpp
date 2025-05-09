@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <stack>
 
 #include "include/DimacsFormatException.h"
 #include "include/DimacsReader.h"
@@ -31,6 +32,27 @@ bool recursiveTrivialBranching(CNFFormula& formula, size_t currentVariable = 0) 
         return true;
     }
     formula.revokeVariableAssignment(currentVariable);
+    return false;
+}
+
+bool iterativeTrivialBranching(CNFFormula& formula) {
+    std::stack<std::pair<size_t, bool>> variables;
+    variables.push(std::make_pair<size_t, bool>(0, false));
+    variables.push(std::make_pair<size_t, bool>(0, true));
+    while (!variables.empty()) {
+        auto v = variables.top();
+        variables.pop();
+        formula.assignVariable(v.first, v.second);
+        if (formula.getAssignmentState() == dimacs::TRUE) {
+            return true;
+        }
+        if (formula.getAssignmentState() == dimacs::UNKNOWN) {
+            variables.push(std::make_pair<size_t, bool>(v.first + 1, false));
+            variables.push(std::make_pair<size_t, bool>(v.first + 1, true));
+        } else {
+            formula.revokeVariableAssignment(v.first);
+        }
+    }
     return false;
 }
 
@@ -109,7 +131,7 @@ void dimacs::solve(const std::string& filePath) {
     std::vector<size_t> v;
     auto start = std::chrono::system_clock::now();
 
-    recursiveTrivialBranching(formula);
+    std::cout << iterativeTrivialBranching(formula) << std::endl;;
     auto end = std::chrono::system_clock::now();
     std::cout << end-start << std::endl;
 }
