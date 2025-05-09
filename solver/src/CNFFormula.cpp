@@ -104,7 +104,7 @@ void CNFFormula::assignVariable(size_t varId, bool polarity) {
     Variable& v = variables.at(varId);
     v.assignValue(polarity);
     unassignedVariables.erase(varId);
-    for (auto & it : v) {
+    for (auto& it : v) {
         auto clauseId = it.first;
         Clause& c = clauses.at(clauseId);
         auto prevState = c.getState();
@@ -184,11 +184,11 @@ void CNFFormula::changeAssignmentState(size_t clauseId, dimacs::varAssignment pr
                                        dimacs::varAssignment newState) {
     if (prevState != newState) {
         if (newState == dimacs::TRUE) {
-            satisfiedClauses.emplace(clauseId);
+            satisfiedClauses.insert(clauseId);
         } else if (newState == dimacs::FALSE) {
-            emptyClauses.emplace(clauseId);
+            emptyClauses.insert(clauseId);
         } else {
-            unknownClauses.emplace(clauseId);
+            unknownClauses.insert(clauseId);
         }
         if (prevState == dimacs::TRUE) {
             satisfiedClauses.erase(clauseId);

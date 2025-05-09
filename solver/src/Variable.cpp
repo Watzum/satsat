@@ -6,6 +6,7 @@
 #include "include/Variable.h"
 
 #include <cassert>
+#include <iostream>
 
 void Variable::addClause(size_t clauseId, bool polarity) {
     clauses.emplace(clauseId, polarity);

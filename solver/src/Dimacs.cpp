@@ -5,48 +5,41 @@
 
 #include <fstream>
 #include <string>
+#include <cassert>
 
 #include "include/Dimacs.h"
 
-#include <cassert>
+#include <algorithm>
+#include <chrono>
 
 #include "include/DimacsFormatException.h"
 #include "include/DimacsReader.h"
 
+int counter = 0;
 
-bool branch(CNFFormula& currentFormula, std::vector<dimacs::varAssignment>& assignment, size_t currentVarId, size_t varCount) {
-    /*CNFFormula positiveBranchFormula = currentFormula;
-    CNFFormula negativeBranchFormula = currentFormula;
-    if (positiveBranchFormula.assignVariable(currentVarId, true)) {
-        auto positiveAssignment = assignment;
-        positiveAssignment[currentVarId] = TRUE;
-        if (currentVarId + 1 < varCount) {
-            if (branch(positiveBranchFormula, positiveAssignment, currentVarId+1, varCount)) {
-                return true;
-            }
-        } else {
-            return true;
-        }
-    } else if (negativeBranchFormula.assignVariable(currentVarId, false)) {
-        auto negativeAssignment = assignment;
-        negativeAssignment[currentVarId] = FALSE;
-        if (currentVarId + 1 < varCount) {
-            if (branch(negativeBranchFormula, negativeAssignment, currentVarId+1, varCount)) {
-                return true;
-            }
-        } else {
-            return true;
-        }
-
-    }*/
+bool recursiveTrivialBranching(CNFFormula& formula, size_t currentVariable = 0) {
+    if (currentVariable == formula.getVariableCount()) {
+        return formula.getAssignmentState() == dimacs::TRUE;
+    }
+    formula.assignVariable(currentVariable, true);
+    if (recursiveTrivialBranching(formula, currentVariable + 1)) {
+        return true;
+    }
+    formula.revokeVariableAssignment(currentVariable);
+    formula.assignVariable(currentVariable, false);
+    if (recursiveTrivialBranching(formula, currentVariable + 1)) {
+        return true;
+    }
+    formula.revokeVariableAssignment(currentVariable);
     return false;
 }
 
-bool branch_3(CNFFormula& formula, const std::vector<size_t>& mapping, std::vector<size_t>& branchedVariables) {
+bool branch_3(CNFFormula& formula, std::vector<size_t>& mapping, std::vector<size_t>& branchedVariables) {
     assert(formula.getVariableCount() > 0);
     formula.assignUnitClauses();
     if (formula.getAssignmentState() == dimacs::TRUE) {
         std::cout << "SAT: ";
+        //std::sort(mapping.begin(), mapping.end(), [](int i, int j) { return abs(i) < abs(j); });
         for (size_t i = 0; i != formula.getVariableCount(); ++i) {
             if (formula.getVariableAssignment(i) == dimacs::FALSE) {
                 std::cout << "-" << mapping.at(i) << " ";
@@ -54,6 +47,7 @@ bool branch_3(CNFFormula& formula, const std::vector<size_t>& mapping, std::vect
                 std::cout << mapping.at(i) << " ";
             }
         }
+        std::cout << '\n';
         return true;
     }
     if (formula.getAssignmentState() == dimacs::FALSE) {
@@ -61,7 +55,7 @@ bool branch_3(CNFFormula& formula, const std::vector<size_t>& mapping, std::vect
     }
     if (formula.getAssignmentState() != dimacs::FALSE && formula.everyVariableAssigned() == false) {
         size_t varId = formula.selectUnassignedVariable();
-        std::cout << "Branch " << varId << " -> TRUE " << std::endl;
+        //std::cout << "Branch " << varId << " -> TRUE " << std::endl;
         formula.assignVariable(varId, true);
         branchedVariables.push_back(varId);
         if (branch_3(formula, mapping, branchedVariables)) {
@@ -80,7 +74,7 @@ bool branch_3(CNFFormula& formula, const std::vector<size_t>& mapping, std::vect
 bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) {
     currentFormula.assignVariable(currentVarId, varCount);
     auto state = currentFormula.getAssignmentState();
-    std::cout << "Branch " << currentVarId << " -> TRUE " << std::endl;
+    //std::cout << "Branch " << currentVarId << " -> TRUE " << std::endl;
     if (state == dimacs::TRUE) {
         return true;
     }
@@ -92,7 +86,7 @@ bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) 
     currentFormula.revokeVariableAssignment(currentVarId);
     currentFormula.assignVariable(currentVarId, false);
     state = currentFormula.getAssignmentState();
-    std::cout << "Branch " << currentVarId << " -> NEGATIVE " << std::endl;
+    //std::cout << "Branch " << currentVarId << " -> NEGATIVE " << std::endl;
     if (state == dimacs::TRUE) {
         return true;
     }  if (state == dimacs::FALSE) {
@@ -113,7 +107,11 @@ void dimacs::solve(const std::string& filePath) {
     DimacsReader reader(formula, mapping);
     reader.readFile(filePath);
     std::vector<size_t> v;
-    std::cout << branch_3(formula, mapping, v) << std::endl;
+    auto start = std::chrono::system_clock::now();
+
+    recursiveTrivialBranching(formula);
+    auto end = std::chrono::system_clock::now();
+    std::cout << end-start << std::endl;
 }
 
 //only works with non-negative integers

@@ -23,7 +23,7 @@ public:
     bool isUnitClause() const;
     bool getPolarity(size_t varId) const;
     size_t getNumberOfVariables() const;
-    dimacs::varAssignment getState();
+    dimacs::varAssignment getState() const;
     std::unordered_map<size_t,bool>::const_iterator begin();
     std::unordered_map<size_t,bool>::const_iterator end();
 

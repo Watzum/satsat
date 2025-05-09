@@ -60,7 +60,7 @@ void DimacsReader::readClauses() {
     std::map<long, long> fileToInternal;
     std::string strInput{};
     std::string clause{};
-    long currentClause = -1;
+    long long currentClause = -1;
     while (fileReader >> strInput) {
         if (currentClause == -1) {
             currentClause = relation.addNewClause();

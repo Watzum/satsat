@@ -4,7 +4,6 @@
 
 #ifndef CNFFORMULA_H
 #define CNFFORMULA_H
-#include <algorithm>
 #include <iostream>
 #include <vector>
 

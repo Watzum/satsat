@@ -12,7 +12,7 @@
 using namespace std;
 
 void test1() {
-    dimacs::solve("../ex1.dimacs");
+    dimacs::solve("../lorecs_example_sat.dimacs");
 }
 
 
