@@ -35,15 +35,36 @@ bool recursiveTrivialBranching(CNFFormula& formula, size_t currentVariable = 0) 
     return false;
 }
 
+void printAssignment(const dimacs::varAssignment assignment[], size_t size) {
+    for (int i = 0; i < size; i++) {
+        if (assignment[i] == dimacs::FALSE) {
+            std::cout << "-";
+        }
+        std::cout << i << " ";
+    }
+    std::cout << '\n';
+}
+
 bool iterativeTrivialBranching(CNFFormula& formula) {
     std::stack<std::pair<size_t, bool>> variables;
     variables.push(std::make_pair<size_t, bool>(0, false));
     variables.push(std::make_pair<size_t, bool>(0, true));
+    dimacs::varAssignment assignment[formula.getVariableCount()];
+    for (int i = 0; i < sizeof(assignment) / sizeof(dimacs::varAssignment); i++) {
+        assignment[i] = dimacs::UNKNOWN;
+    }
     while (!variables.empty()) {
         auto v = variables.top();
         variables.pop();
         formula.assignVariable(v.first, v.second);
+        if (v.second) {
+            assignment[v.first] = dimacs::TRUE;
+        } else {
+            assignment[v.first] = dimacs::FALSE;
+        }
         if (formula.getAssignmentState() == dimacs::TRUE) {
+            std::cout << "SAT ";
+            printAssignment(assignment, sizeof(assignment) / sizeof(dimacs::varAssignment));
             return true;
         }
         if (formula.getAssignmentState() == dimacs::UNKNOWN) {
@@ -51,6 +72,7 @@ bool iterativeTrivialBranching(CNFFormula& formula) {
             variables.push(std::make_pair<size_t, bool>(v.first + 1, true));
         } else {
             formula.revokeVariableAssignment(v.first);
+            assignment[v.first] = dimacs::UNKNOWN;
         }
     }
     return false;
