@@ -68,7 +68,7 @@ void DimacsReader::readClauses(std::vector<size_t>& mapping) {
     while (fileReader.peek() == 'c') {
         fileReader.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    while (fileReader >> strInput) {
+    while (fileReader >> strInput && strInput != "%") {
         if (strInput == "c") {
             fileReader.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         } else {
