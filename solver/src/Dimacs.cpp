@@ -180,8 +180,9 @@ long dimacs::to_positive_long(const std::string& s) {
     return stol(s);
 }
 
+
 void dimacs::ignore_whitespaces(std::ifstream& fileReader) {
-    if (fileReader.peek() == ' ') {
+    while (fileReader.peek() == ' ') {
         fileReader.ignore(1);
     }
 }

@@ -123,7 +123,6 @@ TEST(Test1Suite, CNFFormulaAssignment) {
     f.addVariableToClause(v2, c1, false);
 
     f.assignVariable(v1, false);
-    std::cout << f.getAssignmentState() << std::endl;
     ASSERT_TRUE(f.getAssignmentState() == dimacs::UNKNOWN);
     f.assignVariable(v2, true);
     ASSERT_TRUE(f.getAssignmentState() == dimacs::FALSE);
@@ -239,66 +238,11 @@ TEST(Test1Suite, resetAssignmentTest) {
     ASSERT_TRUE(f.getAssignmentState() == dimacs::UNKNOWN);
 }
 
-/*TEST(Test1Suite, CorrectFormulaRepresentation1) {
-    DimacsReader reader;
-    CNFFormula c{reader.readFile("../../Google_tests/dimacsFiles/DimacsTest2.dimacs")};
-    //auto v = c.getClausesOfVariable(c.getInternalVarOf(1));
-    auto v = c.getVariable(c.getInternalVarOf(1));
 
-    ASSERT_EQ(v.at(0).first, 0);
-    ASSERT_EQ(v.at(0).second, true);
-    ASSERT_EQ(v.size(), 1);
-
-    v = c.getClausesOfVariable(c.getInternalVarOf(2));
-    ASSERT_EQ(v.at(0).first, 0);
-    ASSERT_EQ(v.at(0).second, true);
-    ASSERT_EQ(v.at(1).first, 1);
-    ASSERT_EQ(v.at(1).second, false);
-
-    v = c.getClausesOfVariable(c.getInternalVarOf(3));
-    ASSERT_EQ(v.at(0).first, 0);
-    ASSERT_EQ(v.at(0).second, false);
-    ASSERT_EQ(v.at(1).first, 1);
-    ASSERT_EQ(v.at(1).second, true);
-
-    v = c.getClausesOfVariable(c.getInternalVarOf(4));
-    ASSERT_EQ(v.at(0).first, 1);
-    ASSERT_EQ(v.at(0).second, true);
-    ASSERT_EQ(v.at(1).first, 2);
-    ASSERT_EQ(v.at(1).second, false);
-
-    v = c.getClausesOfVariable(c.getInternalVarOf(5));
-    ASSERT_EQ(v.at(0).first, 1);
-    ASSERT_EQ(v.at(0).second, true);
-    ASSERT_EQ(v.at(1).first, 2);
-    ASSERT_EQ(v.at(1).second, false);
+TEST(Test1Suite, dimacsCommentTest) {
+    CNFFormula c;
+    DimacsReader r{c};
+    ASSERT_NO_THROW(r.readFile("../../Google_tests/dimacsFiles/DimacsComments1.dimacs"));
+    ASSERT_NO_THROW(r.readFile("../../Google_tests/dimacsFiles/DimacsComments2.dimacs"));
+    ASSERT_NO_THROW(r.readFile("../../Google_tests/dimacsFiles/DimacsComments3.dimacs"));
 }
-
-TEST(Test1Suite, CorrectFormulaRepresentation2) {
-    DimacsReader reader;
-    CNFFormula c{reader.readFile("../../Google_tests/dimacsFiles/DimacsTest2.dimacs")};
-    auto v = c.getVariablesOfClause(0);
-    ASSERT_EQ(v.at(0).first, c.getInternalVarOf(1));
-    ASSERT_EQ(v.at(0).second, true);
-    ASSERT_EQ(v.at(1).first, c.getInternalVarOf(2));
-    ASSERT_EQ(v.at(1).second, true);
-    ASSERT_EQ(v.at(2).first, c.getInternalVarOf(3));
-    ASSERT_EQ(v.at(2).second, false);
-    ASSERT_EQ(v.size(), 3);
-    v = c.getVariablesOfClause(1);
-    ASSERT_EQ(v.at(0).first, c.getInternalVarOf(4));
-    ASSERT_EQ(v.at(0).second, true);
-    ASSERT_EQ(v.at(1).first, c.getInternalVarOf(2));
-    ASSERT_EQ(v.at(1).second, false);
-    ASSERT_EQ(v.at(2).first, c.getInternalVarOf(5));
-    ASSERT_EQ(v.at(2).second, true);
-    ASSERT_EQ(v.at(3).first, c.getInternalVarOf(3));
-    ASSERT_EQ(v.at(3).second, true);
-    ASSERT_EQ(v.size(), 4);
-    v = c.getVariablesOfClause(2);
-    ASSERT_EQ(v.at(0).first, c.getInternalVarOf(4));
-    ASSERT_EQ(v.at(0).second, false);
-    ASSERT_EQ(v.at(1).first, c.getInternalVarOf(5));
-    ASSERT_EQ(v.at(1).second, false);
-    ASSERT_EQ(v.size(), 2);
-}*/
