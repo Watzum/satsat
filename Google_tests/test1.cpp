@@ -25,7 +25,7 @@ TEST(Test1Suite, ToPositiveLong) {
 TEST(Test1Suite, DimacsReaderPositive1) {
     CNFFormula rel;
     DimacsReader reader(rel);
-    reader.readFile("../../Google_tests/dimacsFiles/DimacsTest1.dimacs");
+    std::vector<size_t> mapping = reader.readFile("../../Google_tests/dimacsFiles/DimacsTest1.dimacs");
     ASSERT_EQ(rel.getVariable(0).getNumberOfClauses(), 1);
     ASSERT_EQ(rel.getVariable(1).getNumberOfClauses(), 2);
     ASSERT_EQ(rel.getVariable(2).getNumberOfClauses(), 2);
@@ -50,7 +50,7 @@ TEST(Test1Suite, DimacsReaderPositive1) {
 TEST(Test1Suite, DimacsReaderPositive2) {
     CNFFormula rel;
     DimacsReader reader(rel);
-    reader.readFile("../../Google_tests/dimacsFiles/DimacsTest2.dimacs");
+    std::vector<size_t> mapping = reader.readFile("../../Google_tests/dimacsFiles/DimacsTest2.dimacs");
     ASSERT_EQ(rel.getVariable(0).getNumberOfClauses(), 1);
     ASSERT_EQ(rel.getVariable(1).getNumberOfClauses(), 2);
     ASSERT_EQ(rel.getVariable(2).getNumberOfClauses(), 2);

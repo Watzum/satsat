@@ -3,6 +3,7 @@
 //
 
 #include <string>
+
 #include "include/Variable.h"
 
 #include <cassert>

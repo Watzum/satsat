@@ -8,7 +8,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "Variable.h"
 #include "Dimacs.h"
 
 class Variable {

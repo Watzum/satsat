@@ -2,9 +2,7 @@
 // Created by Emil Watz on 01.02.2025.
 //
 
-#include <fstream>
 #include <iostream>
-#include <string>
 
 #include "include/DimacsReader.h"
 #include "include/Dimacs.h"

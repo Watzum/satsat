@@ -12,18 +12,20 @@
 #include "include/Dimacs.h"
 #include "include/DimacsFormatException.h"
 
-DimacsReader::DimacsReader(CNFFormula& formula, std::vector<size_t>& m): relation(formula), mapping(m) {
+DimacsReader::DimacsReader(CNFFormula& formula): relation(formula) {
 }
 
 
-void DimacsReader::readFile(const std::string& filePath) {
+std::vector<size_t> DimacsReader::readFile(const std::string& filePath) {
+    std::vector<size_t> internalToFileVariableMapping;
     fileReader = std::ifstream{filePath};
     if (!fileReader) {
         throw std::runtime_error("Could not open dimacs file!");
     }
     readHeader();
-    readClauses();
+    readClauses(internalToFileVariableMapping);
     fileReader.close();
+    return internalToFileVariableMapping;
 }
 
 
@@ -44,10 +46,8 @@ void DimacsReader::readHeader() {
     delete buf;
     fileReader >> strInput;
     long variableCount = dimacs::to_positive_long(strInput);
-    //std::cout << "Number of variables: " << variableCount << std::endl;
     fileReader >> strInput;
     long clauseCount = dimacs::to_positive_long(strInput);
-    //std::cout << "Number of clauses: " << clauseCount << std::endl;
     dimacs::ignore_whitespaces(fileReader);
     char linebreak;
     fileReader.get(linebreak);
@@ -56,7 +56,7 @@ void DimacsReader::readHeader() {
     }
 }
 
-void DimacsReader::readClauses() {
+void DimacsReader::readClauses(std::vector<size_t>& mapping) {
     std::map<long, long> fileToInternal;
     std::string strInput{};
     std::string clause{};

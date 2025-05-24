@@ -35,17 +35,17 @@ bool recursiveTrivialBranching(CNFFormula& formula, size_t currentVariable = 0) 
     return false;
 }
 
-void printAssignment(const dimacs::varAssignment assignment[], size_t size) {
+void printAssignment(const dimacs::varAssignment assignment[], size_t size, const std::vector<size_t>& m) {
     for (int i = 0; i < size; i++) {
         if (assignment[i] == dimacs::FALSE) {
             std::cout << "-";
         }
-        std::cout << i << " ";
+        std::cout << m.at(i) << " ";
     }
     std::cout << '\n';
 }
 
-bool iterativeTrivialBranching(CNFFormula& formula) {
+bool iterativeTrivialBranching(CNFFormula& formula, const std::vector<size_t>& internalToFileVarMapping) {
     std::stack<std::pair<size_t, bool>> variables;
     variables.push(std::make_pair<size_t, bool>(0, false));
     variables.push(std::make_pair<size_t, bool>(0, true));
@@ -64,7 +64,8 @@ bool iterativeTrivialBranching(CNFFormula& formula) {
         }
         if (formula.getAssignmentState() == dimacs::TRUE) {
             std::cout << "SAT ";
-            printAssignment(assignment, sizeof(assignment) / sizeof(dimacs::varAssignment));
+            printAssignment(assignment,
+                sizeof(assignment) / sizeof(dimacs::varAssignment), internalToFileVarMapping);
             return true;
         }
         if (formula.getAssignmentState() == dimacs::UNKNOWN) {
@@ -147,13 +148,12 @@ bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) 
 
 void dimacs::solve(const std::string& filePath) {
     CNFFormula formula;
-    std::vector<size_t> mapping;
-    DimacsReader reader(formula, mapping);
-    reader.readFile(filePath);
-    std::vector<size_t> v;
+
+    DimacsReader reader(formula);
+    std::vector<size_t> mapping = reader.readFile(filePath);
     auto start = std::chrono::system_clock::now();
 
-    std::cout << iterativeTrivialBranching(formula) << std::endl;;
+    std::cout << iterativeTrivialBranching(formula, mapping) << std::endl;;
     auto end = std::chrono::system_clock::now();
     std::cout << end-start << std::endl;
 }

@@ -15,5 +15,4 @@ namespace dimacs {
 }
 
 
-
 #endif //DIMACS_H

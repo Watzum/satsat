@@ -12,15 +12,14 @@
 
 class DimacsReader {
     public:
-        explicit DimacsReader(CNFFormula& formula, std::vector<size_t>& mapping);
-        void readFile(const std::string &filePath);
+        explicit DimacsReader(CNFFormula& formula);
+        std::vector<size_t> readFile(const std::string &filePath);
     private:
         CNFFormula& relation;
-        std::vector<size_t>& mapping;
         std::ifstream fileReader = nullptr;
 
         void readHeader();
-        void readClauses();
+        void readClauses(std::vector<size_t>&);
 
 };
 
