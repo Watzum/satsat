@@ -10,7 +10,9 @@
 using namespace std;
 
 void test1() {
-    dimacs::solve("../lorecs_example_sat.dimacs");
+    //dimacs::solveIterative("../dimacsTest.dimacs");
+
+    dimacs::solveIterative("../Google_tests/dimacsFiles/extFiles/sat/uf20-01.cnf");
 }
 
 

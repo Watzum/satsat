@@ -13,7 +13,7 @@
 class Variable {
 public:
 
-    Variable() : assignment(dimacs::varAssignment::TRUE), negative_occurrences(0), positive_occurrences(0) {}
+    Variable() : assignment(dimacs::varAssignment::UNKNOWN), negative_occurrences(0), positive_occurrences(0) {}
 
     void addClause(size_t clauseId, bool polarity);
     void removeClause(size_t clauseId);

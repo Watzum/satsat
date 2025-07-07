@@ -40,7 +40,9 @@ void printAssignment(const dimacs::varAssignment assignment[], size_t size, cons
         if (assignment[i] == dimacs::FALSE) {
             std::cout << "-";
         }
-        std::cout << m.at(i) << " ";
+        if (assignment[i] != dimacs::UNKNOWN) {
+            std::cout << m.at(i) << " ";
+        }
     }
     std::cout << '\n';
 }
@@ -56,6 +58,11 @@ bool iterativeTrivialBranching(CNFFormula& formula, const std::vector<size_t>& i
     while (!variables.empty()) {
         auto v = variables.top();
         variables.pop();
+        if (formula.getVariableAssignment(v.first) != dimacs::UNKNOWN) {
+            //std::cout << "Revoke " << v.first << '\n';
+            formula.revokeVariableAssignment(v.first);
+        }
+        //std::cout << "Assign " << v.first << " -> " << v.second << '\n';
         formula.assignVariable(v.first, v.second);
         if (v.second) {
             assignment[v.first] = dimacs::TRUE;
@@ -68,12 +75,10 @@ bool iterativeTrivialBranching(CNFFormula& formula, const std::vector<size_t>& i
                 sizeof(assignment) / sizeof(dimacs::varAssignment), internalToFileVarMapping);
             return true;
         }
-        if (formula.getAssignmentState() == dimacs::UNKNOWN) {
+
+        if (v.first + 1 < formula.getVariableCount()) {
             variables.push(std::make_pair<size_t, bool>(v.first + 1, false));
             variables.push(std::make_pair<size_t, bool>(v.first + 1, true));
-        } else {
-            formula.revokeVariableAssignment(v.first);
-            assignment[v.first] = dimacs::UNKNOWN;
         }
     }
     return false;
@@ -146,16 +151,31 @@ bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) 
     return false;
 }
 
-void dimacs::solve(const std::string& filePath) {
+
+bool dimacs::solveIterative(const std::string& filePath) {
     CNFFormula formula;
 
     DimacsReader reader(formula);
     std::vector<size_t> mapping = reader.readFile(filePath);
     auto start = std::chrono::system_clock::now();
-
-    std::cout << iterativeTrivialBranching(formula, mapping) << std::endl;;
+    bool ret{iterativeTrivialBranching(formula, mapping)};
+    std::cout << ret << std::endl;;
     auto end = std::chrono::system_clock::now();
     std::cout << end-start << std::endl;
+    return ret;
+}
+
+bool dimacs::solveRecursive(const std::string& filePath) {
+    CNFFormula formula;
+
+    DimacsReader reader(formula);
+    std::vector<size_t> mapping = reader.readFile(filePath);
+    auto start = std::chrono::system_clock::now();
+    bool ret{recursiveTrivialBranching(formula)};
+    std::cout << ret << std::endl;;
+    auto end = std::chrono::system_clock::now();
+    std::cout << end-start << std::endl;
+    return ret;
 }
 
 //only works with non-negative integers

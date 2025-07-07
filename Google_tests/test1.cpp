@@ -246,3 +246,9 @@ TEST(Test1Suite, dimacsCommentTest) {
     ASSERT_NO_THROW(r.readFile("../../Google_tests/dimacsFiles/DimacsComments2.dimacs"));
     ASSERT_NO_THROW(r.readFile("../../Google_tests/dimacsFiles/DimacsComments3.dimacs"));
 }
+
+
+TEST(Test1Suite, benchmarkTestSAT) {
+    ASSERT_TRUE(dimacs::solveRecursive("../../Google_tests/dimacsFiles/extFiles/sat/uf20-01.cnf"));
+    ASSERT_TRUE(dimacs::solveIterative("../../Google_tests/dimacsFiles/extFiles/sat/uf20-01.cnf"));
+}
