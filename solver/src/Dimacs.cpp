@@ -18,6 +18,18 @@
 
 int counter = 0;
 
+void printAssignment(const dimacs::varAssignment assignment[], size_t size, const std::vector<size_t>& m) {
+    for (int i = 0; i < size; i++) {
+        if (assignment[i] == dimacs::FALSE) {
+            std::cout << "-";
+        }
+        if (assignment[i] != dimacs::UNKNOWN) {
+            std::cout << i << " ";
+        }
+    }
+    std::cout << '\n';
+}
+
 bool recursiveTrivialBranching(CNFFormula& formula, size_t currentVariable = 0) {
     if (currentVariable == formula.getVariableCount()) {
         return formula.getAssignmentState() == dimacs::TRUE;
@@ -35,22 +47,12 @@ bool recursiveTrivialBranching(CNFFormula& formula, size_t currentVariable = 0) 
     return false;
 }
 
-void printAssignment(const dimacs::varAssignment assignment[], size_t size, const std::vector<size_t>& m) {
-    for (int i = 0; i < size; i++) {
-        if (assignment[i] == dimacs::FALSE) {
-            std::cout << "-";
-        }
-        if (assignment[i] != dimacs::UNKNOWN) {
-            std::cout << m.at(i) << " ";
-        }
-    }
-    std::cout << '\n';
-}
 
 bool iterativeTrivialBranching(CNFFormula& formula, const std::vector<size_t>& internalToFileVarMapping) {
-    std::stack<std::pair<size_t, bool>> variables;
-    variables.push(std::make_pair<size_t, bool>(0, false));
-    variables.push(std::make_pair<size_t, bool>(0, true));
+    std::stack<std::pair<size_t, dimacs::varAssignment>> variables;
+    variables.push(std::make_pair<size_t, dimacs::varAssignment>(0, dimacs::varAssignment::UNKNOWN));
+    variables.push(std::make_pair<size_t, dimacs::varAssignment>(0, dimacs::varAssignment::TRUE));
+    variables.push(std::make_pair<size_t, dimacs::varAssignment>(0, dimacs::varAssignment::FALSE));
     dimacs::varAssignment assignment[formula.getVariableCount()];
     for (int i = 0; i < sizeof(assignment) / sizeof(dimacs::varAssignment); i++) {
         assignment[i] = dimacs::UNKNOWN;
@@ -58,16 +60,14 @@ bool iterativeTrivialBranching(CNFFormula& formula, const std::vector<size_t>& i
     while (!variables.empty()) {
         auto v = variables.top();
         variables.pop();
+        assignment[v.first] = v.second;
         if (formula.getVariableAssignment(v.first) != dimacs::UNKNOWN) {
-            //std::cout << "Revoke " << v.first << '\n';
             formula.revokeVariableAssignment(v.first);
         }
-        //std::cout << "Assign " << v.first << " -> " << v.second << '\n';
-        formula.assignVariable(v.first, v.second);
-        if (v.second) {
-            assignment[v.first] = dimacs::TRUE;
-        } else {
-            assignment[v.first] = dimacs::FALSE;
+        if (v.second == dimacs::TRUE) {
+            formula.assignVariable(v.first, true);
+        } else if (v.second == dimacs::FALSE) {
+            formula.assignVariable(v.first, false);
         }
         if (formula.getAssignmentState() == dimacs::TRUE) {
             std::cout << "SAT ";
@@ -75,77 +75,10 @@ bool iterativeTrivialBranching(CNFFormula& formula, const std::vector<size_t>& i
                 sizeof(assignment) / sizeof(dimacs::varAssignment), internalToFileVarMapping);
             return true;
         }
-
-        if (v.first + 1 < formula.getVariableCount()) {
-            variables.push(std::make_pair<size_t, bool>(v.first + 1, false));
-            variables.push(std::make_pair<size_t, bool>(v.first + 1, true));
-        }
-    }
-    return false;
-}
-
-bool branch_3(CNFFormula& formula, std::vector<size_t>& mapping, std::vector<size_t>& branchedVariables) {
-    assert(formula.getVariableCount() > 0);
-    formula.assignUnitClauses();
-    if (formula.getAssignmentState() == dimacs::TRUE) {
-        std::cout << "SAT: ";
-        //std::sort(mapping.begin(), mapping.end(), [](int i, int j) { return abs(i) < abs(j); });
-        for (size_t i = 0; i != formula.getVariableCount(); ++i) {
-            if (formula.getVariableAssignment(i) == dimacs::FALSE) {
-                std::cout << "-" << mapping.at(i) << " ";
-            } else if (formula.getVariableAssignment(i) == dimacs::TRUE) {
-                std::cout << mapping.at(i) << " ";
-            }
-        }
-        std::cout << '\n';
-        return true;
-    }
-    if (formula.getAssignmentState() == dimacs::FALSE) {
-        return false;
-    }
-    if (formula.getAssignmentState() != dimacs::FALSE && formula.everyVariableAssigned() == false) {
-        size_t varId = formula.selectUnassignedVariable();
-        //std::cout << "Branch " << varId << " -> TRUE " << std::endl;
-        formula.assignVariable(varId, true);
-        branchedVariables.push_back(varId);
-        if (branch_3(formula, mapping, branchedVariables)) {
-            return true;
-        }
-    }
-    formula.resetAssignment();
-    size_t c = formula.addNewClause();
-    for (size_t i : branchedVariables) {
-        formula.addVariableToClause(i, c, false);
-    }
-    branchedVariables.clear();
-    return branch_3(formula, mapping, branchedVariables);
-}
-
-bool branch_2(CNFFormula& currentFormula, size_t currentVarId, size_t varCount) {
-    currentFormula.assignVariable(currentVarId, varCount);
-    auto state = currentFormula.getAssignmentState();
-    //std::cout << "Branch " << currentVarId << " -> TRUE " << std::endl;
-    if (state == dimacs::TRUE) {
-        return true;
-    }
-    if (currentVarId + 1 < varCount) {
-        if (branch_2(currentFormula, currentVarId + 1, varCount)) {
-            return true;
-        }
-    }
-    currentFormula.revokeVariableAssignment(currentVarId);
-    currentFormula.assignVariable(currentVarId, false);
-    state = currentFormula.getAssignmentState();
-    //std::cout << "Branch " << currentVarId << " -> NEGATIVE " << std::endl;
-    if (state == dimacs::TRUE) {
-        return true;
-    }  if (state == dimacs::FALSE) {
-        currentFormula.revokeVariableAssignment(currentVarId);
-        return false;
-    }
-    if (currentVarId + 1 < varCount) {
-        if (branch_2(currentFormula, currentVarId + 1, varCount)) {
-            return true;
+        if (v.second != dimacs::UNKNOWN && v.first + 1 < formula.getVariableCount()) {
+            variables.push(std::make_pair<size_t, dimacs::varAssignment>(v.first + 1, dimacs::varAssignment::UNKNOWN));
+            variables.push(std::make_pair<size_t, dimacs::varAssignment>(v.first + 1, dimacs::varAssignment::TRUE));
+            variables.push(std::make_pair<size_t, dimacs::varAssignment>(v.first + 1, dimacs::varAssignment::FALSE));
         }
     }
     return false;
