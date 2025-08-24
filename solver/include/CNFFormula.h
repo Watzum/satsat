@@ -18,6 +18,10 @@ public:
     CNFFormula() = default;
     CNFFormula(const CNFFormula& c) = default;
 
+    bool solveWithTrivialIterativeBranching();
+    bool solveWithTrivialRecursiveBranching(size_t currentVariable = 0);
+    bool solveWithUnitPropagation();
+
     //pre: varId >= 0
     Variable& getVariable(long varId);
     [[nodiscard]] dimacs::varAssignment getVariableAssignment(size_t varId) const;
@@ -38,7 +42,7 @@ public:
     //returns false if assignment results in an empty clause <=> unsat assignment
     void assignVariable(size_t varId, bool polarity);
     void revokeVariableAssignment(size_t varId);
-    void assignUnitClauses();
+    std::vector<std::size_t> assignUnitClauses();
     void resetAssignment();
 
     size_t selectUnassignedVariable() const;

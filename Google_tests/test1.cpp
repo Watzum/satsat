@@ -8,6 +8,9 @@
 #include "include/DimacsFormatException.h"
 #include "include/DimacsReader.h"
 
+#include <filesystem>
+namespace fs = std::filesystem;
+
 TEST(Test1Suite, ToPositiveLong) {
     ASSERT_EQ(dimacs::to_positive_long("1"), 1);
     ASSERT_EQ(dimacs::to_positive_long("123"), 123);
@@ -248,7 +251,31 @@ TEST(Test1Suite, dimacsCommentTest) {
 }
 
 
-TEST(Test1Suite, benchmarkTestSAT) {
-    ASSERT_TRUE(dimacs::solveRecursive("../../Google_tests/dimacsFiles/extFiles/sat/uf20-01.cnf"));
-    ASSERT_TRUE(dimacs::solveIterative("../../Google_tests/dimacsFiles/extFiles/sat/uf20-01.cnf"));
+TEST(Test1Suite, unitPropagationSATTest) {
+    try {
+        for (const auto& entry : fs::directory_iterator("../../Google_tests/dimacsFiles/extFiles/sat")) {
+            CNFFormula c;
+            DimacsReader r{c};
+            r.readFile(entry.path().string());
+            std::cout << entry.path().string() << std::endl;
+            ASSERT_TRUE(c.solveWithUnitPropagation());
+        }
+    } catch (const fs::filesystem_error& e) {
+        std::cout << e.what() << std::endl;
+    }
+}
+
+
+TEST(Test1Suite, unitPropagationUNSATTest) {
+    try {
+        for (const auto& entry : fs::directory_iterator("../../Google_tests/dimacsFiles/extFiles/UUF50.218.1000_unsat")) {
+            CNFFormula c;
+            DimacsReader r{c};
+            r.readFile(entry.path().string());
+            std::cout << entry.path().string() << std::endl;
+            ASSERT_FALSE(c.solveWithUnitPropagation());
+        }
+    } catch (const fs::filesystem_error& e) {
+        std::cout << e.what() << std::endl;
+    }
 }

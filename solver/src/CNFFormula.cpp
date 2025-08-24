@@ -6,7 +6,101 @@
 
 #include <cassert>
 #include <iostream>
+#include <stack>
 #include <stdexcept>
+
+bool CNFFormula::solveWithTrivialIterativeBranching() {
+    std::stack<std::pair<size_t, dimacs::varAssignment>> variable_stack;
+    if (getVariableCount() > 0) {
+        variable_stack.push(std::make_pair<size_t, dimacs::varAssignment>(0, dimacs::varAssignment::UNKNOWN));
+        variable_stack.push(std::make_pair<size_t, dimacs::varAssignment>(0, dimacs::varAssignment::TRUE));
+        variable_stack.push(std::make_pair<size_t, dimacs::varAssignment>(0, dimacs::varAssignment::FALSE));
+    }
+    while (!variable_stack.empty()) {
+        auto v = variable_stack.top();
+        variable_stack.pop();
+        if (getVariableAssignment(v.first) != dimacs::UNKNOWN) {
+            revokeVariableAssignment(v.first);
+        }
+        if (v.second == dimacs::TRUE) {
+            assignVariable(v.first, true);
+        } else if (v.second == dimacs::FALSE) {
+            assignVariable(v.first, false);
+        }
+        if (getAssignmentState() == dimacs::TRUE) {
+            std::cout << "SAT ";
+            //printCurrentAssignment();
+            return true;
+        }
+        if (v.second != dimacs::UNKNOWN && v.first + 1 < getVariableCount()) {
+            variable_stack.push(std::make_pair<size_t, dimacs::varAssignment>(v.first + 1, dimacs::varAssignment::UNKNOWN));
+            variable_stack.push(std::make_pair<size_t, dimacs::varAssignment>(v.first + 1, dimacs::varAssignment::TRUE));
+            variable_stack.push(std::make_pair<size_t, dimacs::varAssignment>(v.first + 1, dimacs::varAssignment::FALSE));
+        }
+    }
+    return false;
+}
+
+bool CNFFormula::solveWithTrivialRecursiveBranching(size_t currentVariable) {
+    if (currentVariable == getVariableCount()) {
+        return getAssignmentState() == dimacs::TRUE;
+    }
+    assignVariable(currentVariable, true);
+    if (solveWithTrivialRecursiveBranching(currentVariable + 1)) {
+        return true;
+    }
+    revokeVariableAssignment(currentVariable);
+    assignVariable(currentVariable, false);
+    if (solveWithTrivialRecursiveBranching(currentVariable + 1)) {
+        return true;
+    }
+    revokeVariableAssignment(currentVariable);
+    return false;
+}
+
+bool CNFFormula::solveWithUnitPropagation() {
+    assignUnitClauses();
+    //Stores, which variables decided the unit propagation assignment of which variables
+    std::stack<std::pair<std::size_t, dimacs::varAssignment>> assignmentStack;
+    if (!unassignedVariables.empty()) {
+        std::unordered_map<std::size_t, std::vector<size_t>> backtrackMap;
+        auto firstVar = selectUnassignedVariable();
+        assignmentStack.push(std::make_pair<>(firstVar, dimacs::TRUE));
+        assignmentStack.push(std::make_pair<>(firstVar, dimacs::UNKNOWN));
+        assignmentStack.push(std::make_pair<>(firstVar, dimacs::FALSE));
+        while (!assignmentStack.empty()) {
+            auto [variableID, assignmentValue] = assignmentStack.top();
+            assignmentStack.pop();
+            if (assignmentValue == dimacs::UNKNOWN) {
+                auto propagatedVariables = backtrackMap.at(variableID);
+                for (auto x : propagatedVariables) {
+                    revokeVariableAssignment(x);
+                }
+                backtrackMap.erase(variableID);
+                revokeVariableAssignment(variableID);
+            } else {
+                assignVariable(variableID, assignmentValue);
+                backtrackMap.emplace(variableID, assignUnitClauses());
+                if (getAssignmentState() == dimacs::TRUE) {
+                    //printCurrentAssignment();
+                    return true;
+                }
+                if (getAssignmentState() == dimacs::UNKNOWN) {
+                    auto nextVar = selectUnassignedVariable();
+                    assignmentStack.push(std::make_pair<>(nextVar, dimacs::UNKNOWN));
+                    assignmentStack.push(std::make_pair<>(nextVar, dimacs::TRUE));
+                    assignmentStack.push(std::make_pair<>(nextVar, dimacs::UNKNOWN));
+                    assignmentStack.push(std::make_pair<>(nextVar, dimacs::FALSE));
+                }
+            }
+
+        }
+    } else {
+        return getAssignmentState() == dimacs::TRUE;
+    }
+    return false;
+}
+
 
 Variable& CNFFormula::getVariable(long varId) {
     if (variables.size() > varId) {
@@ -140,13 +234,16 @@ void CNFFormula::revokeVariableAssignment(size_t varId) {
     unassignedVariables.emplace(varId);
 }
 
-void CNFFormula::assignUnitClauses() {
+std::vector<size_t> CNFFormula::assignUnitClauses() {
+    std::vector<std::size_t> assignedClauses;
     while (!unitClauses.empty()) {
         size_t unitClauseId = *unitClauses.begin();
         Clause& c = clauses.at(unitClauseId);
         auto v = c.getUnitClauseVar();
         assignVariable(v.first, v.second);
+        assignedClauses.push_back(v.first);
     }
+    return assignedClauses;
 }
 
 void CNFFormula::resetAssignment() {
