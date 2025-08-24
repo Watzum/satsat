@@ -59,6 +59,7 @@ bool CNFFormula::solveWithTrivialRecursiveBranching(size_t currentVariable) {
 }
 
 bool CNFFormula::solveWithUnitPropagation() {
+    assignPureVariables();
     assignUnitClauses();
     //Stores, which variables decided the unit propagation assignment of which variables
     std::stack<std::pair<std::size_t, dimacs::varAssignment>> assignmentStack;
@@ -79,8 +80,19 @@ bool CNFFormula::solveWithUnitPropagation() {
                 backtrackMap.erase(variableID);
                 revokeVariableAssignment(variableID);
             } else {
-                assignVariable(variableID, assignmentValue);
-                backtrackMap.emplace(variableID, assignUnitClauses());
+                assignVariable(variableID, assignmentValue); //PURE!!!
+                auto propagatedVariables = assignPureVariables();
+                auto v2 = assignUnitClauses();
+                propagatedVariables.insert(propagatedVariables.end(), v2.begin(), v2.end());
+                size_t oldCount = 0;
+                while (oldCount != propagatedVariables.size()) {
+                    oldCount = propagatedVariables.size();
+                    auto v1 = assignUnitClauses();
+                    auto v2 = assignPureVariables();
+                    propagatedVariables.insert(propagatedVariables.end(), v1.begin(), v1.end());
+                    propagatedVariables.insert(propagatedVariables.end(), v2.begin(), v2.end());
+                }
+                backtrackMap.emplace(variableID, propagatedVariables);
                 if (getAssignmentState() == dimacs::TRUE) {
                     //printCurrentAssignment();
                     return true;
@@ -123,7 +135,6 @@ size_t CNFFormula::addNewVariable() {
 
 
 void CNFFormula::addVariableToClause(size_t varId, size_t clauseId, bool polarity) {
-
     Variable& v = variables.at(varId);
     v.addClause(clauseId, polarity);
     Clause& c = clauses.at(clauseId);
@@ -135,6 +146,12 @@ void CNFFormula::addVariableToClause(size_t varId, size_t clauseId, bool polarit
     } else if (c.getNumberOfVariables() == 2) {
         unitClauses.erase(clauseId);
     }
+    if (!pureVariables.contains(varId) && v.isPure()) {
+        pureVariables.emplace(varId);
+    }
+    if (pureVariables.contains(varId) && !v.isPure()) {
+        pureVariables.erase(varId);
+    }
 }
 
 
@@ -143,6 +160,12 @@ void CNFFormula::removeVariableFromClause(size_t varId, size_t clauseId) {
     v.removeClause(clauseId);
     Clause& c = clauses.at(clauseId);
     c.removeVariable(varId);
+    if (!pureVariables.contains(varId) && v.isPure()) {
+        pureVariables.emplace(varId);
+    }
+    if (pureVariables.contains(varId) && !v.isPure()) {
+        pureVariables.erase(varId);
+    }
 }
 
 
@@ -235,15 +258,27 @@ void CNFFormula::revokeVariableAssignment(size_t varId) {
 }
 
 std::vector<size_t> CNFFormula::assignUnitClauses() {
-    std::vector<std::size_t> assignedClauses;
+    std::vector<std::size_t> assignedVariables;
     while (!unitClauses.empty()) {
         size_t unitClauseId = *unitClauses.begin();
         Clause& c = clauses.at(unitClauseId);
         auto v = c.getUnitClauseVar();
         assignVariable(v.first, v.second);
-        assignedClauses.push_back(v.first);
+        pureVariables.erase(v.first);
+        assignedVariables.push_back(v.first);
     }
-    return assignedClauses;
+    return assignedVariables;
+}
+
+std::vector<std::size_t> CNFFormula::assignPureVariables() {
+    std::vector<std::size_t> assignedVariables;
+    for (const auto& varID : pureVariables) {
+        Variable& var = variables.at(varID);
+        assignVariable(varID, var.getPolarity());
+        assignedVariables.emplace_back(varID);
+    }
+    pureVariables.clear();
+    return assignedVariables;
 }
 
 void CNFFormula::resetAssignment() {
@@ -282,12 +317,28 @@ void CNFFormula::changeAssignmentState(size_t clauseId, dimacs::varAssignment pr
     if (prevState != newState) {
         if (newState == dimacs::TRUE) {
             satisfiedClauses.insert(clauseId);
+            for (auto& v : clauses.at(clauseId)) {
+                Variable& var = variables.at(v.first);
+                bool isPure = var.isPure();
+                var.subtractOccurencesByOne(v.second);
+                if (var.isPure() != isPure) {
+                    pureVariables.emplace(v.first);
+                }
+            }
         } else if (newState == dimacs::FALSE) {
             emptyClauses.insert(clauseId);
         } else {
             unknownClauses.insert(clauseId);
         }
         if (prevState == dimacs::TRUE) {
+            for (auto& v : clauses.at(clauseId)) {
+                Variable& var = variables.at(v.first);
+                bool isPure = var.isPure();
+                var.addOccurencesByOne(v.second);
+                if (isPure != var.isPure()) {
+                    pureVariables.erase(v.first);
+                }
+            }
             satisfiedClauses.erase(clauseId);
         } else if (prevState == dimacs::FALSE) {
             emptyClauses.erase(clauseId);

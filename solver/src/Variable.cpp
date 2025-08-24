@@ -56,6 +56,24 @@ void Variable::unassignValue() {
     assignment = dimacs::varAssignment::UNKNOWN;
 }
 
+void Variable::subtractOccurencesByOne(bool typeOfOccurences) {
+    if (typeOfOccurences) {
+        assert(positive_occurrences > 0);
+        positive_occurrences--;
+    } else {
+        assert(negative_occurrences > 0);
+        negative_occurrences--;
+    }
+}
+
+void Variable::addOccurencesByOne(bool typeOfOccurences) {
+    if (typeOfOccurences) {
+        positive_occurrences++;
+    } else {
+        negative_occurrences++;
+    }
+}
+
 
 size_t Variable::getNumberOfClauses() const {
     return clauses.size();
@@ -76,12 +94,13 @@ std::string Variable::to_string() const {
 
 
 bool Variable::isPure() const {
-    return negative_occurrences == 0 || positive_occurrences == 0;
+    return (negative_occurrences == 0 || positive_occurrences == 0) && assignment == dimacs::UNKNOWN;
 }
 
 
 //precondition: isPure() == true
 bool Variable::getPolarity() const {
+    assert(isPure());
     if (negative_occurrences == 0) {
         return true;
     }

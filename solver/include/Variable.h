@@ -22,6 +22,9 @@ public:
     void assignValue(bool value);
     void unassignValue();
 
+    void subtractOccurencesByOne(bool typeOfOccurences);
+    void addOccurencesByOne(bool typeOfOccurences);
+
     std::unordered_map<size_t,bool>::iterator begin();
     std::unordered_map<size_t,bool>::iterator end();
 

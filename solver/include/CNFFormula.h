@@ -5,6 +5,7 @@
 #ifndef CNFFORMULA_H
 #define CNFFORMULA_H
 #include <iostream>
+#include <unordered_set>
 #include <vector>
 
 #include "Clause.h"
@@ -43,6 +44,7 @@ public:
     void assignVariable(size_t varId, bool polarity);
     void revokeVariableAssignment(size_t varId);
     std::vector<std::size_t> assignUnitClauses();
+    std::vector<std::size_t> assignPureVariables();
     void resetAssignment();
 
     size_t selectUnassignedVariable() const;
@@ -60,6 +62,7 @@ private:
     std::set<size_t> satisfiedClauses;
     std::set<size_t> unknownClauses;
     std::set<size_t> unitClauses;
+    std::unordered_set<size_t> pureVariables;
 };
 
 
